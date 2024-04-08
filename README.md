@@ -13,51 +13,51 @@ The platform supports the following features:
 ## Researcher Account Verification:
 3. Researcher accounts require verification by uploading academic emails, research profiles, or LinkedIn profiles.
 
-# User Login and Security:
+## User Login and Security:
 4. Users can securely log in, log out, and change passwords.
 
-# Profile Management:
+## Profile Management:
 5. Users can edit personal information, including skills, publications, achievements, and profile photos.
 6. Users have the option to delete their accounts.
 
-# Search and View Functionality:
+## Search and View Functionality:
 7. Users can search for and view accounts, topics, and posts within the platform.
 
-# Post Sharing:
+## Post Sharing:
 8. Users can share posts with others.
 
-# Post Saving:
+## Post Saving:
 9. Users can save posts for later reference.
 
-# Delete Posts:
+## Delete Posts:
 10. Users can delete their posts and the shared posts.
 
-# Post Editing:
+## Post Editing:
 11. Users can edit or delete their own posts as needed.
 
-# Comment Management:
+## Comment Management:
 12. Users can write comments on posts. 
 
-# Comment Editing & Deletion:
+## Comment Editing & Deletion:
 13. Users can edit or delete comments.
 
-# Reaction Features:
+## Reaction Features:
 14. Users can react to posts using various reaction options.
 
-# Notifications:
+## Notifications:
 15. Users receive notifications for relevant platform activities.
 
-# Social Interaction:
+## Social Interaction:
 16. Users can follow other researchers to stay updated on their activities.
 17. Users can engage in messaging with other users, including text, voice, links, and document sharing.
 
-# Support Contact:
+## Support Contact:
 18. Users can contact the support team via email for assistance.
 
-# Researcher Post Creation:
+## Researcher Post Creation:
 19. Researchers can create posts, insert references, and label posts according to their field of study.
 
-# Reviewer Post Review:
+## Reviewer Post Review:
 20. Reviewers can review pending scientific posts.
 21. Reviewers can provide feedback on posts and decide to admit or reject them.
 
