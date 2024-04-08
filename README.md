@@ -6,11 +6,11 @@ Our vision is trust, where every post is reliable, and where microphones aren’
 
 # Project Features:
 The platform supports the following features:
-# User Registration and Authentication:
+## User Registration and Authentication:
 1. Users can sign up as either researchers or Non-researchers.
 2. The system sends a confirmation email upon successful registration.
 
-# Researcher Account Verification:
+## Researcher Account Verification:
 3. Researcher accounts require verification by uploading academic emails, research profiles, or LinkedIn profiles.
 
 # User Login and Security:
