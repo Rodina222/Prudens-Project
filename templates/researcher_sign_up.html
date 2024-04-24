@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Researcher Sign Up</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="container mt-auto align-items-center">
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Create an Account</legend>
+            <div class="form-group">
+                {{ form.fname.label(class='form-control-label') }}
+                {{ form.fname(class='form-control form-control-lg') }}
+                {% if form.fname.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.fname.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.lname.label(class='form-control-label') }}
+                {{ form.lname(class='form-control form-control-lg') }}
+                {% if form.lname.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.lname.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.username.label(class='form-control-label') }}
+                {{ form.username(class='form-control form-control-lg') }}
+                {% if form.username.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.email.label(class='form-control-label') }}
+                {{ form.email(class='form-control form-control-lg') }}
+                {% if form.email.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.password.label(class='form-control-label') }}
+                <div class="input-group">
+                    {{ form.password(class='form-control form-control-lg', id='password-field') }}
+                    <div class="input-group-append">
+                        <span class="input-group-text password-toggle-icon" onclick="togglePassword('password-field')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                {% if form.password.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.confirm_password.label(class='form-control-label') }}
+                <div class="input-group">
+                    {{ form.confirm_password(class='form-control form-control-lg', id='confirm-password-field') }}
+                    <div class="input-group-append">
+                        <span class="input-group-text password-toggle-icon" onclick="togglePassword('confirm-password-field')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                {% if form.confirm_password.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.confirm_password.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- Additional Fields -->
+            <div class="form-group">
+                {{ form.linkedin_account.label(class='form-control-label') }}
+                {{ form.linkedin_account(class='form-control form-control-lg') }}
+                {% if form.linkedin_account.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.linkedin_account.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.google_scholar_account.label(class='form-control-label') }}
+                {{ form.google_scholar_account(class='form-control form-control-lg') }}
+                {% if form.google_scholar_account.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.google_scholar_account.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.academic_email.label(class='form-control-label') }}
+                {{ form.academic_email(class='form-control form-control-lg') }}
+                {% if form.academic_email.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.academic_email.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+             <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="mt-4">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <div class="form-group">
+                {{ form.submit(class='btn btn-outline-info') }}
+            </div>
+        </fieldset>
+    </form>
+   
+
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            Already have an Account?
+            <a href="{{ url_for('home') }}" class="ml-2">Sign in</a>
+        </small>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+<script>
+    function togglePassword(passwordFieldId) {
+        var passwordInput = document.getElementById(passwordFieldId);
+        var toggleIcon = passwordInput.parentNode.querySelector(".password-toggle-icon i");
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        }
+    }
+</script>
+</body>
+</html>
