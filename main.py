@@ -14,8 +14,8 @@ db=SQLAlchemy(app)
 app.config['MAIL_SERVER'] = 'mariam7tawfik@gmail.com'  # SMTP server address
 app.config['MAIL_PORT'] = 587  # Port for SMTP
 app.config['MAIL_USE_TLS'] = True  # Use TLS encryption
-app.config['MAIL_USERNAME'] = 'mariam7tawfik@gmail.com'  # Your email username
-app.config['MAIL_PASSWORD'] = 'Mariam01148759507'  # Your email password
+app.config['MAIL_USERNAME'] = ''  # Your email username
+app.config['MAIL_PASSWORD'] = ''  # Your email password
 
 # Initialize Flask-Mail
 mail = Mail(app)
