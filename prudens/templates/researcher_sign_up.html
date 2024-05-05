@@ -13,18 +13,7 @@
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">Create an Account</legend>
-                <!-- Flash messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                <div class="mt-4">
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% endwith %}
+           
             <div class="form-group">
                 {{ form.fname.label(class='form-control-label') }}
                 {{ form.fname(class='form-control form-control-lg') }}
@@ -144,6 +133,18 @@
             <div class="form-group">
                 {{ form.submit(class='btn btn-outline-info') }}
             </div>
+                 <!-- Flash messages -->
+                 {% with messages = get_flashed_messages(with_categories=true) %}
+                 {% if messages %}
+                 <div class="mt-4">
+                     {% for category, message in messages %}
+                     <div class="alert alert-{{ category }}" role="alert">
+                         {{ message }}
+                     </div>
+                     {% endfor %}
+                 </div>
+                 {% endif %}
+                 {% endwith %}
         </fieldset>
     </form>
    
