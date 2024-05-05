@@ -13,6 +13,18 @@
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">Create an Account</legend>
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mt-4">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
             <div class="form-group">
                 {{ form.fname.label(class='form-control-label') }}
                 {{ form.fname(class='form-control form-control-lg') }}
@@ -41,6 +53,17 @@
                 {% if form.username.errors %}
                 <div class="invalid-feedback">
                     {% for error in form.username.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.field_of_study.label(class='form-control-label') }}
+                {{ form.field_of_study(class='form-control form-control-lg') }}
+                {% if form.field_of_study.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.field_of_study.errors %}
                     <span>{{ error }}</span>
                     {% endfor %}
                 </div>
@@ -116,29 +139,8 @@
                 </div>
                 {% endif %}
             </div>
-            <div class="form-group">
-                {{ form.academic_email.label(class='form-control-label') }}
-                {{ form.academic_email(class='form-control form-control-lg') }}
-                {% if form.academic_email.errors %}
-                <div class="invalid-feedback">
-                    {% for error in form.academic_email.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-             <!-- Flash messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="mt-4">
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}" role="alert">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% endwith %}
+        
+         
             <div class="form-group">
                 {{ form.submit(class='btn btn-outline-info') }}
             </div>

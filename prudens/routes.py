@@ -1,7 +1,7 @@
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm
-from prudens import app
+from prudens import app , bcrypt,db
 
 @app.route('/')
 def home():
@@ -19,11 +19,23 @@ def researcher_signup():
     form = RegistrationForm()
     if form.validate_on_submit():
         # Process the form data
-        # Send verification email
-        send_verification_email(form.email.data)
+        hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
+        researcher=Researcher(
+        fname=form.fname.data,
+        lname=form.lname.data,
+        username=form.username.data,
+        email=form.email.data,
+        password=hashed_password,
+        field_of_study=form.field_of_study.data,
+        linkedin_account=form.linkedin_account.data,
+        google_scholar_account=form.google_scholar_account.data
+        )
+
+        db.session.add(researcher)
+        db.session.commit()
         # Flash a success message
-        flash('Verification email sent! Please check your inbox.', 'success')
+        flash('Account created successfullt for {form.username.data}.', 'success')
         return redirect(url_for('home'))
 
     # This part will execute only if the form is first loaded or did not pass validation
