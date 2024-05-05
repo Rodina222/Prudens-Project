@@ -7,11 +7,15 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
+    fname = db.Column(db.String(25), nullable=False)
+    lname = db.Column(db.String(25), nullable=False)
     username = Column(String(50), unique=True, nullable=False)
+    image_file = db.Column(db.String(20), nullable=False, default="default.jpg")
     email = Column(String(120), unique=True, nullable=False)
     password = Column(String(60), nullable=False)
     registered_on = Column(DateTime, nullable=False, default=datetime.utcnow)
     user_type = Column(String(20), nullable=False)  # researcher, reviewer, admin
+    
     comments = db.relationship('Comment', backref='user')
     reacts = db.relationship('React', backref='user')
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
@@ -22,7 +26,7 @@ class User(db.Model):
         'polymorphic_on': user_type
     }
     def __repr__(self):
-        return f"User('{self.id}', '{self.username}', '{self.email}', '{self.registered_on}', '{self.user_type}')"
+        return f"User('{self.fname}','{self.lname}','{self.id}', '{self.username}', '{self.email}', '{self.registered_on}', '{self.user_type}')"
 
 class Researcher(User):
     __tablename__ = 'researcher'  # Specify the table name for the Researcher class
