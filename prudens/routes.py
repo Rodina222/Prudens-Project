@@ -1,6 +1,6 @@
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 from flask import Flask, render_template ,url_for ,flash, redirect, request
-from prudens.forms import RegistrationForm , LoginForm
+from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non
 from prudens import app , bcrypt,db
 import time
 import sqlite3
@@ -63,6 +63,42 @@ def researcher_signup():
                 flash(f'{field}: {error}', 'danger')
 
     return render_template('researcher_sign_up.html', form=form)
+
+
+
+@app.route('/non_researcher_signup', methods=['GET', 'POST'])
+def non_researcher_signup():
+    form = RegistrationForm_Non()
+    if form.validate_on_submit():
+        try:
+            # Process the form data
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            non_researcher = NonResearcher(
+                fname=form.fname.data,
+                lname=form.lname.data,
+                username=form.username.data,
+                email=form.email.data,
+                password=hashed_password
+            )
+
+            db.session.add(non_researcher)
+            db.session.commit()
+            # Flash a success message
+            flash(f"Account created successfully for {form.username.data}", "success")
+            return redirect(url_for('home'))
+        except IntegrityError as e:
+            db.session.rollback()  # Rollback the session to prevent changes
+            if 'email' in str(e):
+                flash('Email is already registered. Please use another email address.', 'error')
+            elif 'username' in str(e):
+                flash('Username is not unique. Please choose another username.', 'error')
+            else:
+                flash('An error occurred. Please try again later.', 'error')
+            return redirect(url_for('non_researcher_signup'))
+
+    return render_template('non_researcher_sign_up.html', form=form)
+
+
 
 @app.route('/verify_email', methods=['GET'])
 def verify_email():

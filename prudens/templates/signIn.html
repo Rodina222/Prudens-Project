@@ -22,8 +22,10 @@
                         <form  action="{{ url_for('researcher_signup') }}">
                             <button type="submit" class="btn btn-primary circle-button circle-button-primary">Researcher</button>
                         </form>
-                         <a href="{{ url_for('forgot_password') }}">Forgot password?</a>
-                        <button type="button" class="btn btn-secondary circle-button circle-button-secondary">Non-Researcher</button>
+                         
+                         <form  action="{{ url_for('non_researcher_signup') }}">
+                            <button type="submit" class="btn btn-secondary circle-button circle-button-secondary">Non-Researcher</button>
+                         </form>
                     </div>
                     <p class="circle-button-text">Already have an account? <a href="{{ url_for('home') }}">Sign In</a></p>
                 </div>
