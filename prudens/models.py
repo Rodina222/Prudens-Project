@@ -15,11 +15,11 @@ class User(db.Model):
     password = Column(String(60), nullable=False)
     registered_on = Column(DateTime, nullable=False, default=datetime.utcnow)
     user_type = Column(String(20), nullable=False)  # researcher, reviewer, admin
-    
+
     comments = db.relationship('Comment', backref='user')
     reacts = db.relationship('React', backref='user')
-    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
-    received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
+    # sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
+    # received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
 
 
     __mapper_args__ = {
@@ -31,7 +31,10 @@ class User(db.Model):
 class Researcher(User):
     __tablename__ = 'researcher'  # Specify the table name for the Researcher class
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)  # Foreign key referencing User
-    field_of_study = db.Column(db.String(100), nullable=True)
+    field_of_study = db.Column(db.String(100), nullable=False)
+    linkedin_account = db.Column(db.String(150), nullable=False)
+    google_scholar_account =db.Column(db.String(150), nullable=False)
+
     publications = db.relationship('Post', backref='author', lazy=True)  # One-to-many relationship with Post
     def __repr__(self):
         return f"User('{self.id}', '{self.username}', '{self.email}', '{self.registered_on}', '{self.field_of_study}')"
@@ -101,12 +104,12 @@ class React(db.Model):
     def __repr__(self):
         return f"React('{self.id}', '{self.post_id}', '{self.user_id}', '{self.created_on}')"
 
-class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    sent_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    def __repr__(self):
-        return f"Message('{self.id}', '{self.sender_id}', '{self.recipient_id}', '{self.content}','{self.sent_on}')"
+# class Message(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+#     recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+#     content = db.Column(db.Text, nullable=False)
+#     sent_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+#     def __repr__(self):
+#         return f"Message('{self.id}', '{self.sender_id}', '{self.recipient_id}', '{self.content}','{self.sent_on}')"
 
