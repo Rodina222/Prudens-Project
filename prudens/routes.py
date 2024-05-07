@@ -1,14 +1,16 @@
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non
-from prudens import app , bcrypt,db
+from prudens import app , bcrypt,db ,mail
 import time
 import sqlite3
 from sqlalchemy.exc import IntegrityError
+from flask_mail import  Message
+
 
 @app.route('/')
 def home():
-    return render_template('signin.html')
+    return render_template('signIn.html')
 
 
 
@@ -84,6 +86,10 @@ def non_researcher_signup():
             db.session.add(non_researcher)
             db.session.commit()
             # Flash a success message
+            msg = Message('Hello', sender='mariam7tawfik@gmail.com', recipients=[form.email.data])
+            msg.body = "Hello sonal my first mail app"
+            mail.send(msg)
+
             flash(f"Account created successfully for {form.username.data}", "success")
             return redirect(url_for('home'))
         except IntegrityError as e:
@@ -117,3 +123,55 @@ def send_verification_email(email):
         mail.send(msg)
     except Exception as e:
         print(e)  # Handle any exceptions here
+
+
+@app.route('/settings')
+def settings():
+    # Retrieve user information from the database based on the email
+    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
+    user = User.query.filter_by(email=email).first()
+    return render_template('settings.html', user=user)
+
+
+
+
+
+
+@app.route('/update_fname', methods=['POST'])
+def update_fname():
+    # Retrieve form data
+    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
+    user = User.query.filter_by(email=email).first()
+    user.fname = request.form['fname']
+    # Commit the changes to the database
+    db.session.commit()
+    return 'User information updated successfully'
+
+@app.route('/update_lname', methods=['POST'])
+def update_lname():
+    # Retrieve form data
+    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
+    user = User.query.filter_by(email=email).first()
+    user.fname = request.form['lname']
+    # Commit the changes to the database
+    db.session.commit()
+    return 'User information updated successfully'
+
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    
+    if request.method == 'POST':
+        # Handle form submission
+        username = request.form.get('username')
+        password = request.form.get('password')
+        return render_template('reviewer_gui.html')
+
+    #     if username == '' and password == '':
+    #         # If both username and password are empty, render a different template
+    #         return render_template('reviewer_gui.html')
+    #     else:
+    #         # Render the sign-in page with an error message
+    #         return render_template('signIn.html', error='Invalid username or password')
+    # else:
+    #     # Render the sign-in page for GET requests
+    #     return render_template ('signIn.html',error=None)

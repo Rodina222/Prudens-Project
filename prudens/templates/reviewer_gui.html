@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviewer Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include any custom stylesheets here -->
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Welcome, Reviewer!</h1>
+                <h2>Pending Posts</h2>
+                <div class="list-group">
+                    {% for post in posts %}
+                        <div class="list-group-item">
+                            <h4 class="list-group-item-heading">{{ post.title }}</h4>
+                            <p class="list-group-item-text">{{ post.content }}</p>
+                            <p class="list-group-item-text">Author: {{ post.author }}</p>
+                            <!-- Add buttons for approving, rejecting, and providing feedback for each post -->
+                            <form action="{{ url_for('approve_post', post_id=post.id) }}" method="POST">
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                            <form action="{{ url_for('reject_post', post_id=post.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger">Reject</button>
+                            </form>
+                            <!-- Add a form field for providing feedback if needed -->
+                            <form action="{{ url_for('provide_feedback', post_id=post.id) }}" method="POST">
+                                <textarea name="feedback" class="form-control" rows="3" placeholder="Provide feedback"></textarea>
+                                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -11,21 +11,20 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///prudens.db'
 db=SQLAlchemy(app)
 bcrypt = Bcrypt()
 
-# with app.app_context():
-#     # Create all tables
-#     db.create_all()
-
-
 
 # Configure Flask-Mail
-app.config['MAIL_SERVER'] = 'mariam7tawfik@gmail.com'  # SMTP server address
-app.config['MAIL_PORT'] = 587  # Port for SMTP
-app.config['MAIL_USE_TLS'] = True  # Use TLS encryption
-app.config['MAIL_USERNAME'] = ''  # Your email username
-app.config['MAIL_PASSWORD'] = ''  # Your email password
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_PORT'] = 465  # or the appropriate SSL port
+
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USERNAME'] = 'mariam7tawfik@gmail.com'  # Your email username
+app.config['MAIL_PASSWORD'] = 'Mariam7tawfik011'  # Your email password
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]
 # Initialize Flask-Mail
 mail = Mail(app)
+mail.smtp_ssl = True
 
 
 from prudens import routes
