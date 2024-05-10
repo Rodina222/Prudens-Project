@@ -1,8 +1,13 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
 from prudens import db
+from prudens import  login_manager
+from flask_login import UserMixin
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
-class User(db.Model):
+class User(db.Model,UserMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -33,14 +38,17 @@ class Researcher(User):
     field_of_study = db.Column(db.String(100), nullable=False)
     linkedin_account = db.Column(db.String(150), nullable=False)
     google_scholar_account =db.Column(db.String(150), nullable=False)
+    
 
     publications = db.relationship('Post', backref='author', lazy=True)  # One-to-many relationship with Post
-    def __repr__(self):
-        return f"User('{self.id}', '{self.username}', '{self.email}', '{self.registered_on}', '{self.field_of_study}')"
+ 
 
     __mapper_args__ = {
         'polymorphic_identity': 'researcher'
+    
     }
+
+    
 
 class NonResearcher(User):
 
@@ -50,8 +58,6 @@ class NonResearcher(User):
     __mapper_args__ = {
         'polymorphic_identity': 'non-researcher'
     }
-    def __repr__(self):
-        return f"User('{self.id}', '{self.username}', '{self.email}', '{self.registered_on}')"
 
 class Reviewer(User):
     __tablename__ = 'reviewer' 
@@ -62,6 +68,7 @@ class Reviewer(User):
     __mapper_args__ = {
         'polymorphic_identity': 'reviewer'
     }
+
 
 
 class Admin(User):
