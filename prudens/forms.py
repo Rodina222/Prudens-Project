@@ -50,3 +50,10 @@ class RegistrationForm_Non(FlaskForm):
         EqualTo('password', message='Passwords must match')
     ])    
     submit = SubmitField('Sign Up')
+
+
+class PostForm(FlaskForm):
+    post = StringField("What's on your mind?", validators=[DataRequired()])
+    label = StringField("Insert Labels", validators=[DataRequired()])
+    ref = StringField("Insert References", validators=[DataRequired()])
+    submit = SubmitField('Add')
