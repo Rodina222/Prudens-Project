@@ -6,33 +6,71 @@
     <title>Reviewer Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Include any custom stylesheets here -->
+    <style>
+        .post-container {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .post-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .post-content {
+            margin-bottom: 10px;
+        }
+        .author-info {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .action-buttons {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <h1>Welcome, Reviewer!</h1>
-                <h2>Pending Posts</h2>
+                <h1 class="text-center">Welcome, Reviewer!</h1>
+                <h2 class="text-center">Pending Posts</h2>
                 <div class="list-group">
-                    {% for post in posts %}
-                        <div class="list-group-item">
-                            <h4 class="list-group-item-heading">{{ post.title }}</h4>
-                            <p class="list-group-item-text">{{ post.content }}</p>
-                            <p class="list-group-item-text">Author: {{ post.author }}</p>
-                            <!-- Add buttons for approving, rejecting, and providing feedback for each post -->
-                            <form action="{{ url_for('approve_post', post_id=post.id) }}" method="POST">
-                                <button type="submit" class="btn btn-success">Approve</button>
+                    <div class="post-container">
+                        <h4 class="post-title">Post Title 1</h4>
+                        <p class="post-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eget consequat turpis.</p>
+                        <p class="author-info">Author: John Doe</p>
+                        <div class="action-buttons">
+                            <form action="/approve_post" method="POST">
+                                <button type="submit" class="btn btn-success mr-2">Approve</button>
                             </form>
-                            <form action="{{ url_for('reject_post', post_id=post.id) }}" method="POST">
-                                <button type="submit" class="btn btn-danger">Reject</button>
+                            <form action="/reject_post" method="POST">
+                                <button type="submit" class="btn btn-danger mr-2">Reject</button>
                             </form>
-                            <!-- Add a form field for providing feedback if needed -->
-                            <form action="{{ url_for('provide_feedback', post_id=post.id) }}" method="POST">
-                                <textarea name="feedback" class="form-control" rows="3" placeholder="Provide feedback"></textarea>
+                            <form action="/provide_feedback" method="POST">
+                                <textarea name="feedback" class="form-control mb-2" rows="3" placeholder="Provide feedback"></textarea>
                                 <button type="submit" class="btn btn-primary">Submit Feedback</button>
                             </form>
                         </div>
-                    {% endfor %}
+                    </div>
+                    <div class="post-container">
+                        <h4 class="post-title">Post Title 2</h4>
+                        <p class="post-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eget consequat turpis.</p>
+                        <p class="author-info">Author: Jane Smith</p>
+                        <div class="action-buttons">
+                            <form action="/approve_post" method="POST">
+                                <button type="submit" class="btn btn-success mr-2">Approve</button>
+                            </form>
+                            <form action="/reject_post" method="POST">
+                                <button type="submit" class="btn btn-danger mr-2">Reject</button>
+                            </form>
+                            <form action="/provide_feedback" method="POST">
+                                <textarea name="feedback" class="form-control mb-2" rows="3" placeholder="Provide feedback"></textarea>
+                                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Repeat the above block for each pending post -->
                 </div>
             </div>
         </div>

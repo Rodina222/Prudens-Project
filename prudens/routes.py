@@ -12,8 +12,6 @@ from flask_mail import  Message
 def home():
     return render_template('signIn.html')
 
-
-
 @app.route('/forgot_password')
 def forgot_password():
     return render_template('forgot_pass.html')
@@ -133,10 +131,6 @@ def settings():
     return render_template('settings.html', user=user)
 
 
-
-
-
-
 @app.route('/update_fname', methods=['POST'])
 def update_fname():
     # Retrieve form data
@@ -157,21 +151,37 @@ def update_lname():
     db.session.commit()
     return 'User information updated successfully'
 
+
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
-    
     if request.method == 'POST':
         # Handle form submission
         username = request.form.get('username')
         password = request.form.get('password')
         return render_template('reviewer_gui.html')
+    # Render the sign-in page
+    return render_template('signIn.html')
 
-    #     if username == '' and password == '':
-    #         # If both username and password are empty, render a different template
-    #         return render_template('reviewer_gui.html')
-    #     else:
-    #         # Render the sign-in page with an error message
-    #         return render_template('signIn.html', error='Invalid username or password')
-    # else:
-    #     # Render the sign-in page for GET requests
-    #     return render_template ('signIn.html',error=None)
+@app.route('/reviewer_gui')
+def reviewer_gui():
+    # Fetch pending posts from the database
+    posts = Post.query.filter_by(status='pending').all()
+    return render_template('reviewer_gui.html', posts=posts)
+
+@app.route('/review_post/<int:post_id>', methods=['POST'])
+def review_post(post_id):
+    # Logic to handle review of the post
+    feedback = request.form.get('feedback')
+    post = Post.query.get_or_404(post_id)
+    post.status = 'approved'
+    db.session.commit()
+    return "Post Reviewed Successfully"
+
+@app.route('/reject_post/<int:post_id>', methods=['POST'])
+def reject_post(post_id):
+    # Logic to handle rejection of the post
+    reason = request.form.get('reason')
+    post = Post.query.get_or_404(post_id)
+    post.status = 'rejected'
+    db.session.commit()
+    return "Post Rejected Successfully"

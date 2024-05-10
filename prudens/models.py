@@ -2,7 +2,6 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
 from prudens import db
 
-
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -84,7 +83,7 @@ class Post(db.Model):
     comments = db.relationship('Comment', backref='post')
     reacts = db.relationship('React', backref='post')
     def __repr__(self):
-        return f"User('{self.id}', '{self.title}', '{self.content}', '{self.author_id}', '{self.reviewer_id}','{self.status}','{self.created_on}')"
+        return f"Post('{self.id}', '{self.title}', '{self.content}', '{self.author_id}', '{self.reviewer_id}','{self.status}','{self.created_on}')"
 
 
 class Comment(db.Model):
