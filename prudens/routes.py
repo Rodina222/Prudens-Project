@@ -6,11 +6,14 @@ import time
 import sqlite3
 from sqlalchemy.exc import IntegrityError
 from flask_mail import  Message
+from flask_login import login_user
 
 
 @app.route('/')
 def home():
-    return render_template('signIn.html')
+    form = LoginForm()
+    return render_template('signIn.html', form=form)
+
 
 
 
@@ -157,21 +160,24 @@ def update_lname():
     db.session.commit()
     return 'User information updated successfully'
 
-@app.route('/signin', methods=['GET', 'POST'])
-def signin():
-    
-    if request.method == 'POST':
-        # Handle form submission
-        username = request.form.get('username')
-        password = request.form.get('password')
-        return render_template('reviewer_gui.html')
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email = form.email.data).first()
+        
+        
+        if user and bcrypt.check_password_hash(user.password,form.password.data):
+          login_user(user, remember = form.remember.data)
+          flash("You have been logged in successfully","success")
+          return render_template('forgot_pass.html')
 
-    #     if username == '' and password == '':
-    #         # If both username and password are empty, render a different template
-    #         return render_template('reviewer_gui.html')
-    #     else:
-    #         # Render the sign-in page with an error message
-    #         return render_template('signIn.html', error='Invalid username or password')
-    # else:
-    #     # Render the sign-in page for GET requests
-    #     return render_template ('signIn.html',error=None)
+
+        
+        else:
+          flash("Login unsuccessful. Please check the credentials","danger")
+
+          return ('Wrong')
+
+    return render_template('signIn.html',form=form)
+
