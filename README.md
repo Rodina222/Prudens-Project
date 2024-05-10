@@ -64,15 +64,15 @@ The platform supports the following features:
 ### Usage
 When running the Prudens Application, the user will encounter the Sign In/Sign Up page as the initial interface. This page presents two options for signing in or signing up as either a researcher or a non-researcher. Additionally, in the event that a user forgets their password, there is a "Forgot Password" link available to send instructions via email for updating the password. Upon successful sign-in, the home page will be customized based on the user's account type, whether they are a researcher, non-researcher, reviewer, or admin.
 
-# Sign Up
+#### Sign Up
 Researcher: Users can sign up as researchers, providing relevant information required for registration.
 Non-Researcher: Users can sign up as non-researchers, filling out necessary details for registration.
-# Sign In
+#### Sign In
 Researcher: Researchers can sign in using their credentials.
 Reviewer: Reviewers can sign in using their credentials.
-# Creating Posts
+#### Creating Posts
 Researcher Privilege: Researchers have the privilege to create and publish posts on the platform.
-# Editing Profile
+#### Editing Profile
 Update First and Last Name: Users can edit their profile information, including updating their first and last names.
 
 
