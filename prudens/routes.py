@@ -8,36 +8,12 @@ from sqlalchemy.exc import IntegrityError
 from flask_mail import  Message
 from flask_login import login_user
 
-
+@app.route('/')
 @app.route('/home')
 def home():
     form = LoginForm()
     return render_template('signIn.html', form=form)
 
-@app.route('/forgot_password', methods=['GET','POST'])
-def forgot_password():
-    form = PostForm()
-    print("yalahwy_0")
-    if form.validate_on_submit():
-        print("yalahwy_1")
-        post_n = Post(
-            author_id=1,
-            reviewer_id=6,
-            title=form.label.data,
-            #refes=form.ref.data,
-            content=form.post.data,
-            status='pending')
-        
-        print("yalahwy_2")
-        db.session.add(post_n)
-        db.session.commit()
-        print("yalahwy_3")
-        # Flash a success message
-        flash(
-            f"post created successfully for {form.label.data}", "success")
-        time.sleep(5)
-       
-    return render_template('add_post.html', form=form)
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
 def researcher_signup():
@@ -130,16 +106,6 @@ def verify_email():
     return 'Email verified successfully!'
 
 
-# Function to send verification email
-def send_verification_email(email):
-    verify_url = url_for('verify_email', _external=False)
-    subject = 'Verify Your Account'
-    body = f'Thank you for signing up! Please click the link below to verify your account:\n\n{verify_url}'
-    msg = Message(subject=subject, recipients=[email], body=body)
-    try:
-        mail.send(msg)
-    except Exception as e:
-        print(e)  # Handle any exceptions here
 
 
 @app.route('/settings')
@@ -178,33 +144,70 @@ def login():
         
         
         if user and bcrypt.check_password_hash(user.password,form.password.data):
+          print('inside ')
           login_user(user, remember = form.remember.data)
-          flash("You have been logged in successfully","success")
-          return render_template('forgot_pass.html')
-  
+          flash(f"You have been logged in successfully","success")
+          if user.user_type=='reviewer':
+             print('jhbhjhbj')
+             posts = Post.query.filter_by(status='pending').all()
+             print('after')
+             return render_template('reviewer_gui.html', posts=posts)
+          elif user.user_type=='researcher':
+             form = PostForm()
+             if form.validate_on_submit():
+                post_n = Post(
+                    author_id=2,
+                    reviewer_id=5,
+                    title=form.label.data,
+                    #refes=form.ref.data,
+                    content=form.post.data,
+                    status='pending')
+                
+                db.session.add(post_n)
+                db.session.commit()
+                # Flash a success message
+                flash(
+                    f"post created successfully for {form.label.data}", "success")
+                time.sleep(5)
+                return render_template('Created ')
+            
+             return render_template('add_post.html', form=form)
+           
+          else:
+             return ('Hello , Login successfully')
+
         else:
-          flash("Login unsuccessful. Please check the credentials","danger")
+          flash(f"Login unsuccessful. Please check the credentials","danger")
 
     return render_template('signIn.html',form=form)
 
-@app.route('/')
-@app.route('/forgot_password', methods=['GET','POST'])
+@app.route('/forgot_password')
 def forgot_password():
-    form = PostForm()
-    if form.validate_on_submit():
-        post_n = Post(
-            author_id=2,
-            reviewer_id=5,
-            title=form.label.data,
-            #refes=form.ref.data,
-            content=form.post.data,
-            status='pending')
-        
-        db.session.add(post_n)
-        db.session.commit()
-        # Flash a success message
-        flash(
-            f"post created successfully for {form.label.data}", "success")
-        time.sleep(5)
-       
-    return render_template('add_post.html', form=form)
+    return render_template('forgot_pass.html')
+
+
+
+
+@app.route('/reviewer_gui')
+def reviewer_gui():
+    # Fetch pending posts from the database
+    posts = Post.query.filter_by(status='pending').all()
+    return render_template('reviewer_gui.html', posts=posts)
+
+@app.route('/review_post/<int:post_id>', methods=['POST'])
+def review_post(post_id):
+    # Logic to handle review of the post
+    feedback = request.form.get('feedback')
+    post = Post.query.get_or_404(post_id)
+    post.status = 'approved'
+    db.session.commit()
+    return "Post Reviewed Successfully"
+
+@app.route('/reject_post/<int:post_id>', methods=['POST'])
+def reject_post(post_id):
+    # Logic to handle rejection of the post
+    reason = request.form.get('reason')
+    post = Post.query.get_or_404(post_id)
+    post.status = 'rejected'
+    db.session.commit()
+    return "Post Rejected Successfully"
