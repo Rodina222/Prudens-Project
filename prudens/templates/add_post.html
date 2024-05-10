@@ -1,1 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Add your custom styles here -->
+    <style>
+        /* Customize your styles for the home page */
+        body {
+            background-color: #f0f0f0;
+        }
+        .menu-bar {
+            border-bottom: 1px solid #ccc; /* Line to recognize the menu bar */
+            padding: 30px 0; /* Adjusted padding for the menu bar */
+        }
+        .menu-icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .menu-icons i {
+            margin: 0 10px;
+            font-size: 20px;
+        }
+        .create-post-section {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-top: 20px; /* Adjusted margin to create space below the menu bar */
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            height: auto; /* Set height to auto for adjustable height */
+            resize: vertical; /* Allow vertical resizing */
+        }
+        .send-btn {
+            background-color: #6c757d; /* Gray color */
+            color: #ffffff; /* White text color */
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<!-- Menu Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
+    <!-- Menu Icons -->
+    <div class="container d-flex justify-content-center"> <!-- Center the container -->
+        <div class="menu-icons d-flex justify-content-between align-items-center"> <!-- Center the icons -->
+            <i id="home-icon" class="fas fa-home" style="font-size: 30px; margin-right: 20px;"></i> <!-- Increase size and margin -->
+            <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px;"></i> <!-- Increase size and margin -->
+            <i id="envelope-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px;"></i> <!-- Increase size and margin -->
+            <i id="thumbtack-icon" class="fas fa-thumbtack" style="font-size: 30px; margin-right: 20px;"></i> <!-- Increase size and margin -->
+            <i id="plus-icon" class="fas fa-plus" style="font-size: 30px;"></i> <!-- Increase size -->
+        </div>
+    </div>
+</nav>
+
+<!-- Create Post Section -->
+<div class="container-fluid create-post-section">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <form action="" method="POST">
+                <!-- What's on your mind Field -->
+                <div class="form-group">
+                    <textarea class="form-control" rows="5" placeholder="What's on your mind?" style="resize: vertical;"></textarea>
+                </div>
+                <!-- Insert Labels Field -->
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" placeholder="Insert Labels"></textarea>
+                </div>
+                <!-- Insert References Field -->
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" placeholder="Insert References"></textarea>
+                </div>
+                <!-- Send Button -->
+                <button type="submit" class="btn btn-secondary send-btn">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+
+</body>
+</html>
 
