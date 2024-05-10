@@ -8,6 +8,7 @@ class RegistrationForm(FlaskForm):
     lname = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=25)])
     username = StringField('User Name', validators=[DataRequired(), Length(min=2, max=25)])
     field_of_study=StringField('Field of Study',validators=[DataRequired(), Length(min=5, max=50)])
+    nothing = StringField('Nothing')
     # Custom email validator to ensure it ends with ".edu"
     def edu_email(form, field):
         if not field.data.lower().endswith('.edu.eg'):
@@ -50,3 +51,10 @@ class RegistrationForm_Non(FlaskForm):
         EqualTo('password', message='Passwords must match')
     ])    
     submit = SubmitField('Sign Up')
+
+
+class PostForm(FlaskForm):
+    post = StringField("What's on your mind?", validators=[DataRequired()])
+    label = StringField("Insert Labels", validators=[DataRequired()])
+    ref = StringField("Insert References", validators=[DataRequired()])
+    submit = SubmitField('Add')

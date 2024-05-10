@@ -1,6 +1,6 @@
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 from flask import Flask, render_template ,url_for ,flash, redirect, request
-from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non
+from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm
 from prudens import app , bcrypt,db ,mail
 import time
 import sqlite3
@@ -9,7 +9,7 @@ from flask_mail import  Message
 from flask_login import login_user
 
 
-@app.route('/')
+@app.route('/home')
 def home():
     form = LoginForm()
     return render_template('signIn.html', form=form)
@@ -17,9 +17,9 @@ def home():
 
 
 
-@app.route('/forgot_password')
-def forgot_password():
-    return render_template('forgot_pass.html')
+# @app.route('/forgot_password')
+# def forgot_password():
+#     return render_template('forgot_pass.html')
 
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
@@ -89,9 +89,6 @@ def non_researcher_signup():
             db.session.add(non_researcher)
             db.session.commit()
             # Flash a success message
-            msg = Message('Hello', sender='mariam7tawfik@gmail.com', recipients=[form.email.data])
-            msg.body = "Hello sonal my first mail app"
-            mail.send(msg)
 
             flash(f"Account created successfully for {form.username.data}", "success")
             return redirect(url_for('home'))
@@ -171,13 +168,30 @@ def login():
           login_user(user, remember = form.remember.data)
           flash("You have been logged in successfully","success")
           return render_template('forgot_pass.html')
-
-
-        
+  
         else:
           flash("Login unsuccessful. Please check the credentials","danger")
 
-          return ('Wrong')
-
     return render_template('signIn.html',form=form)
 
+@app.route('/')
+@app.route('/forgot_password', methods=['GET','POST'])
+def forgot_password():
+    form = PostForm()
+    if form.validate_on_submit():
+        post_n = Post(
+            author_id=2,
+            reviewer_id=5,
+            title=form.label.data,
+            #refes=form.ref.data,
+            content=form.post.data,
+            status='pending')
+        
+        db.session.add(post_n)
+        db.session.commit()
+        # Flash a success message
+        flash(
+            f"post created successfully for {form.label.data}", "success")
+        time.sleep(5)
+       
+    return render_template('add_post.html', form=form)

@@ -14,13 +14,13 @@ bcrypt = Bcrypt()
 login_manager =  LoginManager(app)
 
 # Configure Flask-Mail
-app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_SERVER']=''
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_PORT'] = 465  # or the appropriate SSL port
 
 app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USERNAME'] = 'mariam7tawfik@gmail.com'  # Your email username
-app.config['MAIL_PASSWORD'] = 'Mariam7tawfik011'  # Your email password
+app.config['MAIL_USERNAME'] = ''  # Your email username
+app.config['MAIL_PASSWORD'] = ''  # Your email password
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]
 # Initialize Flask-Mail

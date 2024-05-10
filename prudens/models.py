@@ -39,10 +39,10 @@ class Researcher(User):
     field_of_study = db.Column(db.String(100), nullable=False)
     linkedin_account = db.Column(db.String(150), nullable=False)
     google_scholar_account =db.Column(db.String(150), nullable=False)
+    
 
     publications = db.relationship('Post', backref='author', lazy=True)  # One-to-many relationship with Post
-    def __repr__(self):
-        return f"User('{self.id}', '{self.username}', '{self.email}', '{self.registered_on}', '{self.field_of_study}')"
+ 
 
     __mapper_args__ = {
         'polymorphic_identity': 'researcher'
