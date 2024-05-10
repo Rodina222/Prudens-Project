@@ -12,10 +12,30 @@ from flask_mail import  Message
 def home():
     return render_template('signIn.html')
 
-@app.route('/forgot_password')
+@app.route('/forgot_password', methods=['GET','POST'])
 def forgot_password():
-    return render_template('forgot_pass.html')
-
+    form = PostForm()
+    print("yalahwy_0")
+    if form.validate_on_submit():
+        print("yalahwy_1")
+        post_n = Post(
+            author_id=1,
+            reviewer_id=6,
+            title=form.label.data,
+            #refes=form.ref.data,
+            content=form.post.data,
+            status='pending')
+        
+        print("yalahwy_2")
+        db.session.add(post_n)
+        db.session.commit()
+        print("yalahwy_3")
+        # Flash a success message
+        flash(
+            f"post created successfully for {form.label.data}", "success")
+        time.sleep(5)
+       
+    return render_template('add_post.html', form=form)
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
 def researcher_signup():
