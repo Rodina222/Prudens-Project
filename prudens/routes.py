@@ -1,6 +1,6 @@
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 from flask import Flask, render_template ,url_for ,flash, redirect, request
-from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non
+from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm
 from prudens import app , bcrypt,db ,mail
 import time
 import sqlite3
