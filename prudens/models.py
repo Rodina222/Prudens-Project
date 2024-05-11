@@ -1,8 +1,10 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
-from prudens import db
+from prudens import db,app
 from prudens import  login_manager
 from flask_login import UserMixin
+from itsdangerous import URLSafeSerializer as Serializer
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -29,6 +31,23 @@ class User(db.Model,UserMixin):
     __mapper_args__ = {
         'polymorphic_on': user_type
     }
+
+    def get_reset_token(self):
+        serializer= Serializer(app.config['SECRET_KEY'], salt = 'pw-reset')
+        return serializer.dumps({'user_id': self.id})
+    
+    @staticmethod 
+    def verify_reset_token(token, age = 3600):  # reset password is valid for 1 hour
+        serializer= Serializer(app.config['SECRET_KEY'], salt = 'pw-reset')
+
+        try:
+             user_id = serializer.loads(token , max_age = age)['user_id']
+        
+        except:
+            return None
+        
+        return User.query.get(user_id)
+
     def __repr__(self):
         return f"User('{self.fname}','{self.lname}','{self.id}', '{self.username}', '{self.email}', '{self.registered_on}', '{self.user_type}')"
 

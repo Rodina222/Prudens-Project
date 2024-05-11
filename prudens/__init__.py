@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from datetime import datetime
 from flask_mail import Mail, Message
@@ -14,13 +15,13 @@ bcrypt = Bcrypt()
 login_manager =  LoginManager(app)
 
 # Configure Flask-Mail
-app.config['MAIL_SERVER']=''
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_PORT'] = 465  # or the appropriate SSL port
+app.config['MAIL_SERVER']='smtp.googlemail.com'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 587 
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
 
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USERNAME'] = ''  # Your email username
-app.config['MAIL_PASSWORD'] = ''  # Your email password
+app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
+# app.config['MAIL_USE_SSL'] = True
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]
 # Initialize Flask-Mail
