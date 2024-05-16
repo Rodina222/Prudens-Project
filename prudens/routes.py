@@ -1,4 +1,4 @@
-from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow
+from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm
 from prudens import app , bcrypt,db ,mail
@@ -277,3 +277,4 @@ def unfollow_researcher(researcher_id):
         flash(f'You are not following {researcher.fname} {researcher.lname}.', 'success')
 
     return redirect(url_for('researchers'))
+

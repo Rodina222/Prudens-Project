@@ -19,6 +19,19 @@ class Follow(db.Model):
     def __repr__(self):
         return f"Follow('{self.follower_id}', '{self.followed_id}')"
 
+
+class Message(db.Model):
+    __tablename__ = 'message'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"Message('{self.content}', '{self.timestamp}', '{self.sender_id}', '{self.receiver_id}')"
+
+
 class User(db.Model,UserMixin):
     __tablename__ = 'users'
 
@@ -38,8 +51,12 @@ class User(db.Model,UserMixin):
     followed = db.relationship('Follow', foreign_keys=[Follow.follower_id], backref='follower', lazy='select')
 
 
-    # sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
-    # received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
+       # Relationship with messages sent by the user
+    messages_sent = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
+
+    # Relationship with messages received by the user
+    messages_received = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
+
 
 
     __mapper_args__ = {
@@ -57,6 +74,7 @@ class Researcher(User):
     
 
     publications = db.relationship('Post', backref='author', lazy=True)  # One-to-many relationship with Post
+
  
 
     __mapper_args__ = {
@@ -94,19 +112,6 @@ class Admin(User):
         'polymorphic_identity': 'admin'
     }
 
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey('researcher.id'), nullable=False)  # Foreign key referencing Researcher
-    reviewer_id = db.Column(db.Integer, db.ForeignKey('reviewer.id'))  # Foreign key referencing Reviewer
-    status = db.Column(db.String(20), nullable=False, default='pending')  # pending, approved, rejected
-    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    ########### Relations
-    comments = db.relationship('Comment', backref='post')
-    reacts = db.relationship('React', backref='post')
-    def __repr__(self):
-        return f"Post('{self.id}', '{self.title}', '{self.content}', '{self.author_id}', '{self.reviewer_id}','{self.status}','{self.created_on}')"
 
 
 class Comment(db.Model):
@@ -126,12 +131,29 @@ class React(db.Model):
     def __repr__(self):
         return f"React('{self.id}', '{self.post_id}', '{self.user_id}', '{self.created_on}')"
 
-# class Message(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-#     recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-#     content = db.Column(db.Text, nullable=False)
-#     sent_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-#     def __repr__(self):
-#         return f"Message('{self.id}', '{self.sender_id}', '{self.recipient_id}', '{self.content}','{self.sent_on}')"
 
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.Text, nullable=False)
+    recipient_id = db.Column(db.Integer,db.ForeignKey('researcher.id'), nullable=False)  # ID of the recipient user
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)  # ID of the related post
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    recipient = db.relationship('Researcher', backref='notifications')  # Define the relationship with Researcher
+
+    def __repr__(self):
+        return f"Notification('{self.message}', '{self.recipient_id}', '{self.post_id}', '{self.created_on}')"
+
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('researcher.id'), nullable=False)  # Foreign key referencing Researcher
+    reviewer_id = db.Column(db.Integer, db.ForeignKey('reviewer.id'))  # Foreign key referencing Reviewer
+    status = db.Column(db.String(20), nullable=False, default='pending')  # pending, approved, rejected
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    ########### Relations
+    comments = db.relationship('Comment', backref='post')
+    reacts = db.relationship('React', backref='post')
+    def __repr__(self):
+        return f"Post('{self.id}', '{self.title}', '{self.content}', '{self.author_id}', '{self.reviewer_id}','{self.status}','{self.created_on}')"
