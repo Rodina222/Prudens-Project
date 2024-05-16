@@ -1,4 +1,4 @@
-from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow
+from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm
 from prudens import app , bcrypt,db ,mail
@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from flask_mail import  Message
 from flask_login import login_user
 from flask import session
+from dotenv import load_dotenv  
 
 @app.route('/')
 @app.route('/home')
@@ -141,7 +142,7 @@ def login():
         
         if user and bcrypt.check_password_hash(user.password,form.password.data):
             session['current_user_email'] = form.email.data  # Store user's email in session
-            print(current_user_email)
+        
             login_user(user, remember = form.remember.data)
             flash(f"You have been logged in successfully","success")
 
@@ -277,3 +278,4 @@ def unfollow_researcher(researcher_id):
         flash(f'You are not following {researcher.fname} {researcher.lname}.', 'success')
 
     return redirect(url_for('researchers'))
+
