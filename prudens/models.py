@@ -3,9 +3,21 @@ from sqlalchemy import Column, Integer, String, DateTime
 from prudens import db
 from prudens import  login_manager
 from flask_login import UserMixin
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+
+
+class Follow(db.Model):
+    __tablename__ = 'follow'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+
+    def __repr__(self):
+        return f"Follow('{self.follower_id}', '{self.followed_id}')"
 
 class User(db.Model,UserMixin):
     __tablename__ = 'users'
@@ -22,6 +34,10 @@ class User(db.Model,UserMixin):
 
     comments = db.relationship('Comment', backref='user')
     reacts = db.relationship('React', backref='user')
+    followers = db.relationship('Follow', foreign_keys=[Follow.followed_id], backref='followed', lazy='select')
+    followed = db.relationship('Follow', foreign_keys=[Follow.follower_id], backref='follower', lazy='select')
+
+
     # sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
     # received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
 

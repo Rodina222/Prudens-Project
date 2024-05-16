@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField ,PasswordField ,SubmitField,BooleanField
 from wtforms.validators import DataRequired ,Length,Email ,Regexp ,EqualTo,ValidationError
 from email_validator import validate_email, EmailNotValidError
+from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 
 class RegistrationForm(FlaskForm):
     fname = StringField('First Name', validators=[DataRequired(), Length(min=2, max=25)])
@@ -26,6 +27,18 @@ class RegistrationForm(FlaskForm):
     ])
     linkedin_account = StringField('LinkedIn Account',validators=[DataRequired()])
     google_scholar_account = StringField('Google Scholar Account',validators=[DataRequired()])
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError(
+                "Username already exists! Please chosse a different one"
+            )
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("Email already exists! Please chosse a different one")
+
     
     submit = SubmitField('Sign Up')
 class LoginForm(FlaskForm):
@@ -51,6 +64,19 @@ class RegistrationForm_Non(FlaskForm):
         EqualTo('password', message='Passwords must match')
     ])    
     submit = SubmitField('Sign Up')
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError(
+                "Username already exists! Please chosse a different one"
+            )
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("Email already exists! Please chosse a different one")
+
+    
 
 
 class PostForm(FlaskForm):
@@ -58,3 +84,5 @@ class PostForm(FlaskForm):
     label = StringField("Insert Labels", validators=[DataRequired()])
     ref = StringField("Insert References", validators=[DataRequired()])
     submit = SubmitField('Add')
+
+
