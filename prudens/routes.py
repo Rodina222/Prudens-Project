@@ -1,4 +1,4 @@
-from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
+from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm
 from prudens import app , bcrypt,db ,mail
@@ -7,6 +7,7 @@ import sqlite3
 from sqlalchemy.exc import IntegrityError
 from flask_mail import  Message
 from flask_login import login_user
+from flask import session
 
 @app.route('/')
 @app.route('/home')
@@ -42,12 +43,7 @@ def researcher_signup():
             return redirect(url_for('home'))
     except IntegrityError as e:
         db.session.rollback()  # Rollback the session to prevent changes
-        if 'email' in str(e):
-            flash('Email is already registered. Please use another email address.', 'error')
-        elif 'username' in str(e):
-            flash('Username is not unique. Please choose another username.', 'error')
-        else:
-            flash('An error occurred. Please try again later.', 'error')
+        flash('An error occurred. Please try again later.', 'error')
 
         return redirect(url_for('researcher_signup'))
 
@@ -144,42 +140,55 @@ def login():
         
         
         if user and bcrypt.check_password_hash(user.password,form.password.data):
-          print('inside ')
-          login_user(user, remember = form.remember.data)
-          flash(f"You have been logged in successfully","success")
-          if user.user_type=='reviewer':
-             print('jhbhjhbj')
-             posts = Post.query.filter_by(status='pending').all()
-             print('after')
-             return render_template('reviewer_gui.html', posts=posts)
-          elif user.user_type=='researcher':
-             form = PostForm()
-             if form.validate_on_submit():
-                post_n = Post(
-                    author_id=2,
-                    reviewer_id=5,
-                    title=form.label.data,
-                    #refes=form.ref.data,
-                    content=form.post.data,
-                    status='pending')
+            session['current_user_email'] = form.email.data  # Store user's email in session
+            print(current_user_email)
+            login_user(user, remember = form.remember.data)
+            flash(f"You have been logged in successfully","success")
+
+            if user.user_type=='reviewer':
+                print('jhbhjhbj')
+                posts = Post.query.filter_by(status='pending').all()
+                print('after')
+                return render_template('reviewer_gui.html', posts=posts)
+            elif user.user_type=='researcher':
+                form = PostForm()
+                if form.validate_on_submit():
+                    post_n = Post(
+                        author_id=2,
+                        reviewer_id=5,
+                        title=form.label.data,
+                        #refes=form.ref.data,
+                        content=form.post.data,
+                        status='pending')
+                    
+                    db.session.add(post_n)
+                    db.session.commit()
+                    # Flash a success message
+                    flash(
+                        f"post created successfully for {form.label.data}", "success")
+                    time.sleep(5)
+                    return render_template('Created ')
                 
-                db.session.add(post_n)
-                db.session.commit()
-                # Flash a success message
-                flash(
-                    f"post created successfully for {form.label.data}", "success")
-                time.sleep(5)
-                return render_template('Created ')
+                return render_template('add_post.html', form=form)
             
-             return render_template('add_post.html', form=form)
-           
-          else:
-             return ('Hello , Login successfully')
+            else:
+                return ('Hello , Login successfully')
 
         else:
           flash(f"Login unsuccessful. Please check the credentials","danger")
 
     return render_template('signIn.html',form=form)
+
+
+
+@app.route('/logout',methods=['GET'])
+def logout():
+    session.pop('current_user_email', None)  # Remove user's email from session
+    print(current_user_email)
+    form = LoginForm()
+    return render_template('signIn.html', form=form)
+    
+ 
 
 @app.route('/forgot_password')
 def forgot_password():
@@ -211,3 +220,60 @@ def reject_post(post_id):
     post.status = 'rejected'
     db.session.commit()
     return "Post Rejected Successfully"
+
+
+
+@app.route('/researchers')
+def researchers():
+    researchers = Researcher.query.all()
+    return render_template('follow.html', researchers=researchers)
+
+
+
+@app.route('/follow_researcher/<int:researcher_id>', methods=['POST'])
+def follow_researcher(researcher_id):
+    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+    if not current_user_email:
+        flash('You must be logged in to follow researchers.', 'danger')
+        return redirect(url_for('researchers'))
+    researcher = Researcher.query.get_or_404(researcher_id)
+    current_user = User.query.filter_by(email=current_user_email).first()
+
+    if current_user.id == researcher.id:
+        flash('You cannot follow yourself.', 'danger')
+        return redirect(url_for('researchers'))
+    # Check if the current user is already following the researcher
+    if Follow.query.filter_by(follower_id=current_user.id, followed_id=researcher.id).first():
+        flash(f'You are already following {researcher.fname} {researcher.lname}.', 'info')
+        return redirect(url_for('researchers'))
+
+    # Create a new Follow relationship
+    follow = Follow(follower_id=current_user.id, followed_id=researcher.id)
+    db.session.add(follow)
+    db.session.commit()
+
+    flash(f'You are now following {researcher.fname} {researcher.lname}.', 'success')
+    return redirect(url_for('researchers'))
+
+
+@app.route('/unfollow_researcher/<int:researcher_id>', methods=['POST'])
+def unfollow_researcher(researcher_id):
+    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+    if not current_user_email:
+        flash('You must be logged in to follow researchers.', 'danger')
+        return redirect(url_for('researchers'))
+
+    researcher = Researcher.query.get_or_404(researcher_id)
+    current_user = User.query.filter_by(email=current_user_email).first()
+
+    # Check if the current user is already following the researcher
+    existing_follow = Follow.query.filter_by(follower_id=current_user.id, followed_id=researcher.id).first()
+    if existing_follow:
+        # Delete the existing follow relationship
+        db.session.delete(existing_follow)
+        db.session.commit()
+        flash(f'You have unfollowed {researcher.fname} {researcher.lname}.', 'info')
+    else:
+        flash(f'You are not following {researcher.fname} {researcher.lname}.', 'success')
+
+    return redirect(url_for('researchers'))
