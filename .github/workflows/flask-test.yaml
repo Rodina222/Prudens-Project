@@ -1,0 +1,30 @@
+name: CI/CD
+
+# Controls when the workflow will run
+on:
+  # Activates the workflow; then there is a push to the main or master branch
+  push:
+    branches: [main, master]
+
+  pull_request:
+    branches: [main]
+
+  # allows to manually execute this pipeline from the Actions tab.
+  workflow_dispatch:
+
+# A workflow run consists of one or more jobs that can be executed either sequentially or concurrently.
+jobs:
+ test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
