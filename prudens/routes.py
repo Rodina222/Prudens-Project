@@ -1,11 +1,17 @@
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
 from flask import Flask, render_template ,url_for ,flash, redirect, request
-from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm
+from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm
 from prudens import app , bcrypt,db ,mail
 import time
-import sqlite3
 from sqlalchemy.exc import IntegrityError
-from flask_login import login_user
+from flask_login import (
+    login_required,
+    login_user,
+    current_user,
+    logout_user,
+    login_required,
+)
+
 from flask import session
 from dotenv import load_dotenv  
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
@@ -194,12 +200,46 @@ def logout():
     
  
 
-@app.route('/forgot_password')
-def forgot_password():
-    return render_template('forgot_pass.html')
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def reset_request():
 
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            flash(
+                "If this account exists, you will receive an email with instructions",
+                "info",
+            )
+            # Redirect to the reset password page with the email as a query parameter
+            return redirect(url_for("reset_password", email=form.email.data))
+        
+        else:
+            flash("User not found", "error")
+            return redirect(url_for("login"))
 
+    return render_template('reset_request.html', title="Reset Request", form=form)
 
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    email = request.args.get('email')  # Retrieve email from query parameter
+    if not email:
+        flash("Email not provided", "error")
+        return redirect(url_for("reset_request"))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        print("Form validated")
+        user = User.query.filter_by(email=email).first()
+        #print("New password:", form.password.data)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+        user.password = hashed_password
+        db.session.commit()
+        flash(f"Your password has been updated successfully for {user.email}", "success")
+       # print("Password updated for user:", user.email)
+        return redirect(url_for("login"))
+          
+    return render_template('reset_password.html', title="Reset Password", form=form)
 
 @app.route('/reviewer_gui')
 def reviewer_gui():

@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from datetime import datetime
 from flask_mail import Mail, Message
@@ -5,7 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 import os
-from dotenv import load_dotenv  
+from dotenv import load_dotenv 
+from prudens import routes 
 
 
 load_dotenv()
@@ -32,4 +34,3 @@ mail = Mail(app)
 mail.smtp_ssl = True
 
 
-from prudens import routes
