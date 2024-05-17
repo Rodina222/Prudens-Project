@@ -1,0 +1,38 @@
+{% extends 'base_msg.html' %}
+{% block content %}
+    
+<div class="container">
+    
+    <div class="mt-4">
+        <h1>Received Messages</h1>
+        <ul class="list-group">
+            {% for message in messages_received %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>From: {{ sender_names.get(message.sender_id, 'Unknown') }}</strong><br>
+                        <span>Email: {{ sender_emails.get(message.sender_id, 'Unknown') }}</span><br>
+                        <span>{{ message.content }}</span><br>
+                        <small>Received on: {{ message.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    </div>
+                    <div>
+                        <form action="{{ url_for('reply_message') }}" method="POST">
+                            <input type="hidden" name="receiver_id" value="{{ message.sender_id }}">
+                            <input type="text" name="message_content" class="form-control message-input" placeholder="Type your message">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-paper-plane"></i> Send
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>    
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% endblock %}
