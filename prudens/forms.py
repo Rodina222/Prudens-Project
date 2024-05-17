@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired ,Length,Email ,Regexp ,EqualTo,Valid
 from email_validator import validate_email, EmailNotValidError
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 
+
 class RegistrationForm(FlaskForm):
     fname = StringField('First Name', validators=[DataRequired(), Length(min=2, max=25)])
     lname = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=25)])
@@ -15,12 +16,10 @@ class RegistrationForm(FlaskForm):
         if not field.data.lower().endswith('.edu.eg'):
             raise ValidationError('Email must end with .edu.eg')
 
-    email = StringField('Email', validators=[DataRequired(), Email(), edu_email])
+    email = StringField('Email', validators=[DataRequired(), Email()])
 
-    password = PasswordField('Password', validators=[
-        DataRequired(),
-        Regexp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_])[A-Za-z\\d@$!%*?&_]{8,32}$")
-    ])
+    password = PasswordField('Password', validators=[ DataRequired()])
+    
     confirm_password = PasswordField('Confirm Password', validators=[
         DataRequired(),
         EqualTo('password', message='Passwords must match')
@@ -85,4 +84,21 @@ class PostForm(FlaskForm):
     ref = StringField("Insert References", validators=[DataRequired()])
     submit = SubmitField('Add')
 
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
 
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(
+        "Password",
+        validators=[
+            DataRequired(),
+            Regexp(
+                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,32}$"
+            ),
+        ],
+    )
+    confirm_password = PasswordField(
+        "Confirm Password", validators=[DataRequired(), EqualTo("password")]
+    )
+    submit = SubmitField("Reset Password")

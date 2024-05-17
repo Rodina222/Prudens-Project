@@ -27,6 +27,9 @@
         .action-buttons {
             margin-top: 10px;
         }
+        .feedback-container {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -35,43 +38,42 @@
             <div class="col-md-12">
                 <h1 class="text-center">Welcome, Reviewer!</h1>
                 <h2 class="text-center">Pending Posts</h2>
-                <div class="list-group">
-                    <div class="post-container">
-                        <h4 class="post-title">Post Title 1</h4>
-                        <p class="post-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eget consequat turpis.</p>
-                        <p class="author-info">Author: John Doe</p>
-                        <div class="action-buttons">
-                            <form action="/approve_post" method="POST">
-                                <button type="submit" class="btn btn-success mr-2">Approve</button>
-                            </form>
-                            <form action="/reject_post" method="POST">
-                                <button type="submit" class="btn btn-danger mr-2">Reject</button>
-                            </form>
-                            <form action="/provide_feedback" method="POST">
-                                <textarea name="feedback" class="form-control mb-2" rows="3" placeholder="Provide feedback"></textarea>
-                                <button type="submit" class="btn btn-primary">Submit Feedback</button>
-                            </form>
-                        </div>
+                <!-- Display flashed messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% if message %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
                     </div>
-                    <div class="post-container">
-                        <h4 class="post-title">Post Title 2</h4>
-                        <p class="post-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eget consequat turpis.</p>
-                        <p class="author-info">Author: Jane Smith</p>
-                        <div class="action-buttons">
-                            <form action="/approve_post" method="POST">
-                                <button type="submit" class="btn btn-success mr-2">Approve</button>
-                            </form>
-                            <form action="/reject_post" method="POST">
-                                <button type="submit" class="btn btn-danger mr-2">Reject</button>
-                            </form>
-                            <form action="/provide_feedback" method="POST">
-                                <textarea name="feedback" class="form-control mb-2" rows="3" placeholder="Provide feedback"></textarea>
-                                <button type="submit" class="btn btn-primary">Submit Feedback</button>
-                            </form>
-                        </div>
+                {% else %}
+                    <div class="list-group">
+                        {% for post in posts %}
+                            <div class="post-container">
+                                <h4 class="post-title">{{ post.title }}</h4>
+                                <p class="post-content">{{ post.content }}</p>
+                                <p class="author-info">Author: {{ post.author.username }}</p>
+                                <div class="feedback-container">
+                                    <form action="/review_post/{{ post.id }}" method="POST">
+                                        <div class="form-group">
+                                            <textarea name="feedback" class="form-control" rows="3" placeholder="Provide feedback"></textarea>
+                                        </div>
+                                        <div class="action-buttons">
+                                            <button type="submit" formaction="/review_post/{{ post.id }}" class="btn btn-success mr-2">Approve</button>
+                                            <button type="submit" formaction="/reject_post/{{ post.id }}" class="btn btn-danger mr-2">Reject</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <!-- Repeat the above block for each pending post -->
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
