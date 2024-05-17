@@ -171,8 +171,9 @@ class Post(db.Model):
     reviewer_id = db.Column(db.Integer, db.ForeignKey('reviewer.id'))  # Foreign key referencing Reviewer
     status = db.Column(db.String(20), nullable=False, default='pending')  # pending, approved, rejected
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    feedback =db.Column(db.Text)
     ########### Relations
     comments = db.relationship('Comment', backref='post')
     reacts = db.relationship('React', backref='post')
     def __repr__(self):
-        return f"Post('{self.id}', '{self.title}', '{self.content}', '{self.author_id}', '{self.reviewer_id}','{self.status}','{self.created_on}')"
+        return f"Post('{self.id}', '{self.title}', '{self.content}', '{self.author_id}', '{self.reviewer_id}','{self.status}','{self.created_on}','{self.feedback}')"

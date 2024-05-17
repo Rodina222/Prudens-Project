@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired ,Length,Email ,Regexp ,EqualTo,Valid
 from email_validator import validate_email, EmailNotValidError
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React
 
+
 class RegistrationForm(FlaskForm):
     fname = StringField('First Name', validators=[DataRequired(), Length(min=2, max=25)])
     lname = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=25)])
