@@ -1,14 +1,21 @@
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
 from flask import Flask, render_template ,url_for ,flash, redirect, request
-from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm
+from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm
 from prudens import app , bcrypt,db ,mail
 import time
-import sqlite3
 from sqlalchemy.exc import IntegrityError
-from flask_mail import  Message
-from flask_login import login_user
+from flask_login import (
+    login_required,
+    login_user,
+    current_user,
+    logout_user,
+    login_required,
+)
+
 from flask import session
 from dotenv import load_dotenv  
+from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
+
 
 @app.route('/')
 @app.route('/home')
@@ -151,7 +158,7 @@ def login():
                 posts = Post.query.filter_by(status='pending').all()
                 print('after')
                 return render_template('reviewer_gui.html', posts=posts)
-            elif user.user_type=='researcher':
+            elif user.user_type=='researcher' or user.user_type=='non-researcher':
                 form = PostForm()
                 if form.validate_on_submit():
                     post_n = Post(
@@ -184,19 +191,55 @@ def login():
 
 @app.route('/logout',methods=['GET'])
 def logout():
+
     session.pop('current_user_email', None)  # Remove user's email from session
+    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
     print(current_user_email)
     form = LoginForm()
     return render_template('signIn.html', form=form)
     
  
 
-@app.route('/forgot_password')
-def forgot_password():
-    return render_template('forgot_pass.html')
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def reset_request():
 
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            flash(
+                "If this account exists, you will receive an email with instructions",
+                "info",
+            )
+            # Redirect to the reset password page with the email as a query parameter
+            return redirect(url_for("reset_password", email=form.email.data))
+        
+        else:
+            flash("User not found", "error")
+            return redirect(url_for("login"))
 
+    return render_template('reset_request.html', title="Reset Request", form=form)
 
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    email = request.args.get('email')  # Retrieve email from query parameter
+    if not email:
+        flash("Email not provided", "error")
+        return redirect(url_for("reset_request"))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        print("Form validated")
+        user = User.query.filter_by(email=email).first()
+        #print("New password:", form.password.data)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+        user.password = hashed_password
+        db.session.commit()
+        flash(f"Your password has been updated successfully for {user.email}", "success")
+       # print("Password updated for user:", user.email)
+        return redirect(url_for("login"))
+          
+    return render_template('reset_password.html', title="Reset Password", form=form)
 
 @app.route('/reviewer_gui')  # Make sure this route is defined
 def reviewer_gui():
@@ -240,6 +283,28 @@ def reject_post(post_id):
     post.feedback = feedback
     post.status = 'rejected'
     db.session.commit()
+    return "Post Rejected Successfully"
+
+
+@app.route('/add_post', methods=['GET', 'POST'])
+@login_required
+def add_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post_n = Post(
+            author_id=current_user.id,
+            title=form.label.data,
+            content=form.post.data,
+            status='pending'
+        )
+        db.session.add(post_n)
+        db.session.commit()
+        flash('Post created successfully!', 'success')
+        return redirect(url_for('add_post'))
+
+    return render_template('add_post.html', form=form)
+
+
     flash("Post rejected successfully", "danger")  # Flash message for successful rejection
     return redirect(url_for('reviewer_gui'))
 
@@ -298,3 +363,98 @@ def unfollow_researcher(researcher_id):
 
     return redirect(url_for('researchers'))
 
+
+#@app.route('/')
+@app.route('/send_message', methods=['GET', 'POST'])
+@login_required
+
+def send_message():
+    if request.method == 'POST':
+        receiver_email = request.form.get('email')
+        print(receiver_email)
+        sender_email = session.get('current_user_email')  # Retrieve user's email from session
+        content = request.form.get('message')
+        print(content)
+        receiver = User.query.filter_by(email=receiver_email).first()
+        sender = User.query.filter_by(email=sender_email).first()
+
+        if not receiver:
+            flash('Receiver not found.', 'danger')
+        elif sender_email == receiver_email:
+            flash('You cannot send a message to yourself.', 'danger')
+        else:
+            try:
+                new_message = Message(content=content, sender_id=sender.id, receiver_id=receiver.id)
+                print(f"Message instance created: {new_message}")
+            except Exception as e:
+                print(f"Error creating message instance: {e}")
+
+            # Add and commit the new message to the database
+            try:
+                db.session.add(new_message)
+                db.session.commit()
+                flash('Your message has been sent!', 'success')
+            except Exception as e:
+                print(f"Error committing message to database: {e}")
+                flash('Failed to send message', 'danger')
+            return redirect(url_for('send_message'))
+
+    return render_template('send_message.html',current_page='send_message')
+
+
+@app.route('/sent_messages')
+@login_required
+def sent_messages():
+    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+    current_user = User.query.filter_by(email=current_user_email).first()
+    messages_sent = Message.query.filter_by(sender_id=current_user.id).all()
+    # Fetch receiver names based on receiver_id
+    receiver_names = {}
+    receiver_emails = {}
+    for message in messages_sent:
+        receiver_id = message.receiver_id
+        receiver = User.query.filter_by(id=receiver_id).first()
+        receiver_names[receiver_id] = receiver.fname+' '+receiver.lname 
+        receiver_emails[receiver_id] = receiver.email
+
+    return render_template('sent_messages.html', messages_sent=messages_sent, receiver_names=receiver_names, receiver_emails=receiver_emails,current_page='sent_messages')
+
+
+@app.route('/received_messages')
+@login_required
+def received_messages():
+    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+    current_user = User.query.filter_by(email=current_user_email).first()
+    # Query messages received by the current user
+    messages_received = Message.query.filter_by(receiver_id=current_user.id).all()
+    sender_names = {}
+    sender_emails = {}
+    for message in messages_received:
+        sender_id = message.sender_id
+        sender = User.query.filter_by(id=sender_id).first()
+        sender_names[sender_id] = sender.fname + ' ' + sender.lname
+        sender_emails[sender_id] = sender.email
+    print(messages_received)
+    return render_template('received_messages.html', messages_received=messages_received, sender_names=sender_names, sender_emails=sender_emails,current_page='received_messages')
+
+
+@app.route('/reply_message', methods=['POST'])
+@login_required
+def reply_message():
+    print('reply')
+    if request.method == 'POST':
+        current_user_email = session.get('current_user_email')
+        current_user = User.query.filter_by(email=current_user_email).first()
+
+        receiver_id = request.form.get('receiver_id')
+        message_content = request.form.get('message_content')
+
+        new_message = Message(content=message_content, sender_id=current_user.id, receiver_id=receiver_id)
+        db.session.add(new_message)
+        db.session.commit()
+
+        # Redirect to the sent messages page or any other page as needed
+        return redirect(url_for('sent_messages'))
+
+    # Redirect to the sent messages page if the request method is not POST
+    return redirect(url_for('sent_messages'))
