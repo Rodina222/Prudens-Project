@@ -291,22 +291,55 @@ def reject_post(post_id):
 def add_post():
     form = PostForm()
     if form.validate_on_submit():
-        post_n = Post(
-            author_id=current_user.id,
-            title=form.label.data,
-            content=form.post.data,
-            status='pending'
-        )
-        db.session.add(post_n)
-        db.session.commit()
-        flash('Post created successfully!', 'success')
-        return redirect(url_for('add_post'))
+        current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+        current_user = User.query.filter_by(email=current_user_email).first()
+        if current_user:
+            post_n = Post(
+                author_id=current_user.id,
+                title=form.label.data,
+                content=form.post.data,
+                status='pending',
+                reference=form.ref.data  # Add this line to assign the ref attribute
+            )
+            db.session.add(post_n)
+            db.session.commit()
+            flash('Post created successfully!', 'success')
+            return redirect(url_for('add_post'))
+        else:
+            flash('User not found.', 'danger')
+    else:
+        # Print validation errors for debugging
+        for field, errors in form.errors.items():
+            for error in errors:
+                print(f"Error in {field}: {error}")
+        flash("Post creation failed. Please check the form.", "danger")
+    
+    return render_template('add_post.html', form=form)
 
+    form = PostForm()
+    if form.validate_on_submit():
+        current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+        current_user = User.query.filter_by(email=current_user_email).first()
+        if current_user:
+            post_n = Post(
+                author_id=current_user.id,
+                title=form.label.data,
+                content=form.post.data,
+                status='pending',
+                reference=form.ref.data  # Add this line to assign the ref attribute
+            )
+            db.session.add(post_n)
+            db.session.commit()
+            flash('Post created successfully!', 'success')
+            return redirect(url_for('add_post'))
+        else:
+            flash('User not found.', 'danger')
+    flash("Post creation failed. Please check the form.", "danger")
     return render_template('add_post.html', form=form)
 
 
-    flash("Post rejected successfully", "danger")  # Flash message for successful rejection
-    return redirect(url_for('reviewer_gui'))
+    
+  
 
 @app.route('/researchers')
 def researchers():

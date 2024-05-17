@@ -172,7 +172,7 @@ class Post(db.Model):
     status = db.Column(db.String(20), nullable=False, default='pending')  # pending, approved, rejected
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     feedback =db.Column(db.Text)
-    feedback =db.Column(db.Text)
+    reference =db.Column(db.Text)
     ########### Relations
     comments = db.relationship('Comment', backref='post')
     reacts = db.relationship('React', backref='post')
