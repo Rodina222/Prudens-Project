@@ -24,11 +24,23 @@
               <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px"></i>
           </a>
             <!-- Increase size and margin -->
-            <i id="envelope-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px"></i>
+            
+            <a href="{{ url_for('send_message') }}">
+                <i id="message-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px"></i>
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                <i class="fas fa-sign-out-alt" style="font-size: 30px; margin-right: 20px;"></i>
+            </a>
+            
+            
+            
             <!-- Increase size and margin -->
             <i id="thumbtack-icon" class="fas fa-thumbtack" style="font-size: 30px; margin-right: 20px"></i>
             <!-- Increase size and margin -->
             <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
+            
+            
             <!-- Increase size -->
         </div>
     </div>
