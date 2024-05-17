@@ -33,3 +33,4 @@ mail.smtp_ssl = True
 
 
 from prudens import routes
+

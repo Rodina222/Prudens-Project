@@ -198,31 +198,50 @@ def forgot_password():
 
 
 
-@app.route('/reviewer_gui')
+@app.route('/reviewer_gui')  # Make sure this route is defined
 def reviewer_gui():
     # Fetch pending posts from the database
     posts = Post.query.filter_by(status='pending').all()
+    if not posts:
+        message = "There are no pending posts. All of them are reviewed."
+        return render_template('reviewer_gui.html', message=message)
     return render_template('reviewer_gui.html', posts=posts)
 
 @app.route('/review_post/<int:post_id>', methods=['POST'])
 def review_post(post_id):
     # Logic to handle review of the post
-    feedback = request.form.get('feedback')
     post = Post.query.get_or_404(post_id)
+    
+    # Check if feedback is provided
+    feedback = request.form.get('feedback')
+    
+    if not feedback:
+        flash("Please provide feedback, if not write N/A.", "warning")
+        return redirect(url_for('reviewer_gui'))
+    
+    post.feedback = feedback
     post.status = 'approved'
     db.session.commit()
-    return "Post Reviewed Successfully"
+    flash("Post approved successfully", "success")  # Flash message for successful approval
+    return redirect(url_for('reviewer_gui'))
 
 @app.route('/reject_post/<int:post_id>', methods=['POST'])
 def reject_post(post_id):
     # Logic to handle rejection of the post
-    reason = request.form.get('reason')
     post = Post.query.get_or_404(post_id)
+    
+    # Check if feedback is provided
+    feedback = request.form.get('feedback')
+    
+    if not feedback:
+        flash("Please provide feedback, if not write N/A.", "warning")
+        return redirect(url_for('reviewer_gui'))
+    
+    post.feedback = feedback
     post.status = 'rejected'
     db.session.commit()
-    return "Post Rejected Successfully"
-
-
+    flash("Post rejected successfully", "danger")  # Flash message for successful rejection
+    return redirect(url_for('reviewer_gui'))
 
 @app.route('/researchers')
 def researchers():
