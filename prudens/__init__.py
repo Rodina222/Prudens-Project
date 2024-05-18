@@ -7,6 +7,10 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 import os
 from dotenv import load_dotenv 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 571be78e12ccfb97f237fea2ed7b8cf1aabacab1
 
 load_dotenv()
 
