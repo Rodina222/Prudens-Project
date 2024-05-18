@@ -4,7 +4,7 @@ body {
 }
 
 .container {
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .card {
@@ -112,3 +112,181 @@ body {
     font-size: 24px;
 }
 
+.settings-icon {
+    padding-left: 10px;
+    font-size: 30px; 
+    margin-right: 20px; 
+    margin-top: 20px;
+}
+
+.post-container {
+    margin-bottom: 20px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 20px;
+}
+.post-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+.post-content {
+    margin-bottom: 10px;
+}
+.author-info {
+    color: #666;
+    margin-bottom: 10px;
+}
+.action-buttons {
+    margin-top: 10px;
+}
+.feedback-container {
+    margin-top: 10px;
+    
+}
+
+.list-group {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0; /* Removes default padding */
+    margin-bottom: 0; /* Removes default margin */
+    margin-left: 50px;
+    height: 600px; /* Fixed height */
+    overflow-y: auto;   /*   Add vertical scroll bar */
+    background-color: grey; /* Default background color */
+}
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: -1px; /* Adjusts the margin to overlap the borders */
+    background-color: #fff; /* Default background color */
+    border: 1px solid rgba(0, 0, 0, 0.125); /* Default border */
+}
+
+.list-group-item:first-child {
+    border-top-left-radius: 0; /* Removes border radius for the first item */
+    border-top-right-radius: 0; /* Removes border radius for the first item */
+}
+
+.list-group-item:last-child {
+    margin-bottom: 0; /* Removes bottom margin for the last item */
+    border-bottom-right-radius: 0; /* Removes border radius for the last item */
+    border-bottom-left-radius: 0; /* Removes border radius for the last item */
+}
+
+.list-group-item:hover,
+.list-group-item:focus {
+    z-index: 1;
+    text-decoration: none;
+    color: #495057; /* Change text color on hover/focus */
+    background-color: #f8f9fa; /* Change background color on hover/focus */
+    border-color: rgba(0, 0, 0, 0.125); /* Change border color on hover/focus */
+}
+
+.comment-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.comment-input {
+    width: calc(100% - 50px); /* Increased width */
+    padding-right: 40px; /* Space for the submit button */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.submit-btn {
+    position: absolute;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    color: grey;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.share-btn, .react-btn {
+    display: flex;
+    align-items: center;
+    background-color:  grey;
+}
+
+.share-btn i, .react-btn i {
+    margin-left: 5px;
+}
+
+
+.emotion-buttons {
+    display: none;
+    position: absolute;
+    top: -2px; /* Position above the react button */
+    left: 0;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 10;
+}
+
+.emotion-button {
+    font-family: 'Noto Emoji', sans-serif; /* Specify the font family */
+    font-size: 20px;
+    padding: 5px 10px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.happy {
+    background-color: #ffd700; /* Yellow */
+}
+
+.sad {
+    background-color: #87ceeb; /* Sky Blue */
+}
+
+.angry {
+    background-color: #ff6347; /* Tomato */
+}
+
+.excited {
+    background-color: #32cd32; /* Lime Green */
+}
+
+
+.active-btn {
+    color: #fff !important;
+    background-color: #007bff !important;
+}
+
+.scroll-box {
+    height: 200px; /* Adjust the height as needed */
+    overflow-y: scroll; /* Enable vertical scrolling */
+    border: 1px solid #ccc; /* Add a border for better visibility */
+    background-color: #fff; /* Set background color to white */
+    padding: 10px; /* Add padding for better appearance */
+}
+
+.author-box {
+    background-color: grey; /* Grey background */
+    padding: 2px 5px; /* Adjust padding as needed */
+    border-radius: 2px;
+    display: inline-block; /* Display as inline block */
+}
+
+.author-name {
+    font-weight: bold;
+    color: black;
+}

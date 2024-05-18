@@ -19,10 +19,25 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, cur
 
 
 @app.route('/')
-@app.route('/home')
 def home():
     form = LoginForm()
     return render_template('signIn.html', form=form)
+
+@app.route('/home')
+def home_page():
+    # Fetch pending posts from the database
+    posts = Post.query.all()
+    if not posts:
+      #  message = "There are no posts yet! Follow other users and see their posts."
+        return render_template('home_page.html')
+      # Fetch author information for each post
+    for post in posts:
+        author = User.query.get(post.author_id)
+        post.author_first_name = author.fname
+        post.author_last_name = author.lname
+    
+    return render_template('home_page.html', posts=posts)
+ 
 
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
