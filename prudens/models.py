@@ -178,3 +178,9 @@ class Post(db.Model):
     reacts = db.relationship('React', backref='post')
     def __repr__(self):
         return f"Post('{self.id}', '{self.title}', '{self.content}', '{self.author_id}', '{self.reviewer_id}','{self.status}','{self.created_on}','{self.feedback}')"
+
+class Issue(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('researcher.id'), nullable=False) 
+    content = db.Column(db.Text, nullable=False)
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

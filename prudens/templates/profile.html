@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Page</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <!-- Add your custom styles here -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Menu Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
+      <div class="container d-flex justify-content-between">
+        <!-- Left Icons -->
+        <div class="left-icons d-flex align-items-center">
+          <a href="{{ url_for('support') }}">
+            <i
+              id="support-icon"
+              class="fas fa-life-ring"
+              style="font-size: 30px; margin-right: 20px"
+            ></i>
+          </a>
+          <a href="{{ url_for('settings') }}">
+            <i
+              id="settings-icon"
+              class="fas fa-cog"
+              style="font-size: 30px; margin-right: 20px"
+            ></i>
+          </a>
+        </div>
+        <!-- Center Icons -->
+        <div
+          class="menu-icons d-flex justify-content-center align-items-center"
+        >
+          <i
+            id="home-icon"
+            class="fas fa-home"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <i
+            id="bell-icon"
+            class="fas fa-bell"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <i
+            id="envelope-icon"
+            class="fas fa-envelope"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <i
+            id="thumbtack-icon"
+            class="fas fa-thumbtack"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <a href="{{ url_for('login') }}">
+            <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
+          </a>
+        </div>
+        <!-- Right Icon -->
+        <div class="right-icons d-flex align-items-center">
+          <a href="{{ url_for('profile') }}">
+            <i
+              id="user-icon"
+              class="fas fa-user-circle"
+              style="
+                font-size: 30px;
+                border-radius: 50%;
+                padding: 5px;
+                background-color: #f0f0f0;
+              "
+            ></i>
+          </a>
+        </div>
+      </div>
+    </nav>
+    <!-- Create Post Section -->
+    <div class="container mt-4">
+      <div class="list-group">
+        {% if posts|length == 1 %}
+          {% set post = posts[0] %}
+          <div class="post-wrapper">
+            <p class="text-above-post">{{ post.author_id }} {{ post.author_id }} posted:</p>
+            <a href="#" class="list-group-item list-group-item-action">
+              <div class="post-container">
+                <div class="author-info">
+                  <div class="author-name">
+                    
+                  </div>
+                </div>
+                <p class="post-content">{{ post.content }}</p>
+                <div class="post-actions mt-3">
+                  <button type="button" class="btn btn-primary" id="like-btn-{{ post.id }}">Like</button>
+                  <button type="button" class="btn btn-secondary" id="share-btn-{{ post.id }}">Share</button>
+                </div>
+              </div>
+            </a>
+          </div>
+        {% else %}
+          {% for post in posts %}
+            <div class="post-wrapper">
+              <p class="text-above-post">{{ post.author_id }} {{ post.author_id }} posted:</p>
+              <a href="#" class="list-group-item list-group-item-action">
+                <div class="post-container">
+                  <div class="author-info">
+                    <div class="author-name">
+                      
+                    </div>
+                  </div>
+                  <p class="post-content">{{ post.content }}</p>
+                  <div class="post-actions mt-3">
+                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary delete-btn">Delete</button>
+                        </div>
+                    </form>
+                    <form action="{{ url_for('Edit_post', post_id=post.id) }}" method="post">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-secondary edit-btn">Edit</button>
+                        </div>
+                    </form>
+                </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

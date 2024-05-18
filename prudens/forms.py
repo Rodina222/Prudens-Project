@@ -102,3 +102,5 @@ class ResetPasswordForm(FlaskForm):
         "Confirm Password", validators=[DataRequired(), EqualTo("password")]
     )
     submit = SubmitField("Reset Password")
+class support_form(FlaskForm):
+    problem = StringField("what's your issue?", validators=[DataRequired()])
