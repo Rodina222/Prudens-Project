@@ -123,6 +123,9 @@ def notification():
         existing_notification = Notification.query.filter_by(recipient_id=current_user.id, post_id=post.id).first()
         if not existing_notification:
             message = f"Your post '{post.title}' has been {post.status}."
+            if post.status == 'rejected':
+                feedback = post.feedback
+                message += f" Feedback: {feedback}"
             notification = Notification(
                 message=message,
                 recipient_id=current_user.id,
@@ -132,12 +135,17 @@ def notification():
             db.session.add(notification)
     db.session.commit()
 
-    # Fetch unique notifications for the current user
-    notifications = Notification.query.filter_by(recipient_id=current_user.id).distinct(Notification.post_id).all()
+    # Fetch unique notifications for the current user including feedback from the associated post
+    notifications = []
+    for notification in Notification.query.filter_by(recipient_id=current_user.id).distinct(Notification.post_id).all():
+        post = Post.query.get(notification.post_id)
+        notifications.append({
+            'message': notification.message,
+            'created_on': notification.created_on,
+            'feedback': post.feedback if post else None  # Fetch feedback from associated post
+        })
 
     return render_template('notification.html', notifications=notifications)
-
-
 # Add a route for handling the back button redirection
 @app.route('/back_to_add_post')
 def back_to_add_post():

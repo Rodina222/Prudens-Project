@@ -29,6 +29,11 @@
       margin-bottom: 10px;
     }
     
+    /* Styles for notification status */
+    .status {
+      font-style: italic;
+    }
+    
     /* Styles for approved posts */
     .approved {
       background-color: #a8e6cf; /* Light green */
@@ -70,6 +75,7 @@
         <div class="content">
           <div class="title">{{ notification.message }}</div>
           <div class="time">{{ notification.created_on }}</div>
+          <div class="feedback">{% if notification.feedback %} Feedback: {{ notification.feedback }} {% endif %}</div>
         </div>
       </div>
       {% endfor %}
