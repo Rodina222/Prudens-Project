@@ -1,0 +1,35 @@
+<!-- templates/navbar.html -->
+<style>
+    .menu-icons a i {
+        color: #000; /* Default dark color for all icons */
+    }
+    .menu-icons a.active i {
+        color: #7cebe8; /* Bright color for the active link */
+        font-weight: bold; /* Optional: make it bold */
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
+    <div class="container d-flex justify-content-center">
+        <div class="menu-icons d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('home_page') }}" class="{% if current_page == 'home_page' %}active{% endif %}">
+                <i id="home-icon" class="fas fa-home" style="font-size: 30px; margin-right: 20px;"></i>
+            </a>
+            <a href="{{ url_for('notification') }}" class="{% if current_page == 'notifications' %}active{% endif %}">
+                <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px;"></i>
+            </a>
+            <a href="{{ url_for('send_message') }}" class="{% if current_page == 'send_message' %}active{% endif %}">
+                <i id="message-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px;"></i>
+            </a>
+            <a href="{{ url_for('add_post') }}" class="{% if current_page == 'add_post' %}active{% endif %}">
+                <i id="plus-icon" class="fas fa-plus" style="font-size: 30px; margin-right: 20px;"></i>
+            </a>
+            <a href="{{ url_for('settings') }}" class="{% if current_page == 'settings' %}active{% endif %}">
+                <i id="settings-icon" class="fas fa-cog" style="font-size: 30px; margin-right: 20px;"></i>
+            </a>
+            <a href="{{ url_for('logout') }}" class="{% if current_page == 'logout' %}active{% endif %}">
+                <i class="fas fa-sign-out-alt" style="font-size: 30px; margin-right: 20px;"></i>
+            </a>
+        </div>
+    </div>
+</nav>
