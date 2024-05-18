@@ -170,12 +170,17 @@ def profile():
 def delete_post(post_id):
     print(post_id)
     notification_to_delete = Notification.query.filter_by(post_id=post_id).first()
-    db.session.delete(notification_to_delete)
-    db.session.commit()
+    if notification_to_delete:
+        print(notification_to_delete)
+        db.session.delete(notification_to_delete)
+        db.session.commit()
     
     post_to_delete = Post.query.filter_by(id=post_id).first()
-    db.session.delete(post_to_delete)
-    db.session.commit()
+    if post_to_delete:
+        print(post_to_delete)
+        db.session.delete(post_to_delete)
+        db.session.commit()
+    
     current_user_email = session.get('current_user_email')
     user = User.query.filter_by(email=current_user_email).first()
     posts = Post.query.filter_by(author_id=user.id).filter_by(status='approved').all()
