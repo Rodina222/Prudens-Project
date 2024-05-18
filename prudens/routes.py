@@ -3,6 +3,7 @@ from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm
 from prudens import app , bcrypt,db ,mail
 import time
+from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from flask_login import (
     login_required,
@@ -111,14 +112,36 @@ def verify_email():
 
 
 
-
 @app.route('/settings')
+@login_required
 def settings():
-    # Retrieve user information from the database based on the email
-    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
-    user = User.query.filter_by(email=email).first()
-    return render_template('settings.html', user=user)
+    # Fetch approved or rejected posts for the current user
+    approved_rejected_posts = Post.query.filter_by(author_id=current_user.id).filter(Post.status.in_(['approved', 'rejected'])).all()
+    
+    # Create notifications for approved or rejected posts if they don't exist
+    for post in approved_rejected_posts:
+        existing_notification = Notification.query.filter_by(recipient_id=current_user.id, post_id=post.id).first()
+        if not existing_notification:
+            message = f"Your post '{post.title}' has been {post.status}."
+            notification = Notification(
+                message=message,
+                recipient_id=current_user.id,
+                post_id=post.id,
+                created_on=datetime.utcnow()
+            )
+            db.session.add(notification)
+    db.session.commit()
 
+    # Fetch unique notifications for the current user
+    notifications = Notification.query.filter_by(recipient_id=current_user.id).distinct(Notification.post_id).all()
+
+    return render_template('settings.html', notifications=notifications)
+
+
+# Add a route for handling the back button redirection
+@app.route('/back_to_add_post')
+def back_to_add_post():
+    return redirect(url_for('add_post.html'), code=302)
 
 @app.route('/update_fname', methods=['POST'])
 def update_fname():
@@ -283,7 +306,8 @@ def reject_post(post_id):
     post.feedback = feedback
     post.status = 'rejected'
     db.session.commit()
-    return "Post Rejected Successfully"
+    flash("Post rejected successfully", "success")  # Flash message for successful approval
+    return redirect(url_for('reviewer_gui'))
 
 
 @app.route('/add_post', methods=['GET', 'POST'])
@@ -300,14 +324,14 @@ def add_post():
         db.session.add(post_n)
         db.session.commit()
         flash('Post created successfully!', 'success')
+        
         return redirect(url_for('add_post'))
 
-    return render_template('add_post.html', form=form)
 
 
-    flash("Post rejected successfully", "danger")  # Flash message for successful rejection
-    return redirect(url_for('reviewer_gui'))
 
+
+   
 @app.route('/researchers')
 def researchers():
     researchers = Researcher.query.all()

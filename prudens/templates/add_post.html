@@ -19,32 +19,36 @@
         <div class="menu-icons d-flex justify-content-between align-items-center">
             <!-- Center the icons -->
             <i id="home-icon" class="fas fa-home" style="font-size: 30px; margin-right: 20px"></i>
-            <!-- Increase size and margin -->
-            <a href="{{ url_for('settings') }}">
-              <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px"></i>
+           <!-- Notification Counter -->
+           <a href="{{ url_for('settings') }}" style="position: relative;">
+            <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px"></i>
+            <!-- Notification Counter (Replace 'notificationCount' with actual count value) -->
+            <span class="counter">{{ notification_count }}</span>
           </a>
             <!-- Increase size and margin -->
-            
+           
             <a href="{{ url_for('send_message') }}">
                 <i id="message-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px"></i>
             </a>
 
+
             <a href="{{ url_for('logout') }}">
                 <i class="fas fa-sign-out-alt" style="font-size: 30px; margin-right: 20px;"></i>
             </a>
-            
-            
-            
+           
+           
+           
             <!-- Increase size and margin -->
             <i id="thumbtack-icon" class="fas fa-thumbtack" style="font-size: 30px; margin-right: 20px"></i>
             <!-- Increase size and margin -->
             <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
-            
-            
+           
+           
             <!-- Increase size -->
         </div>
     </div>
 </nav>
+
 
 <!-- Create Post Section -->
 <div class="container-fluid create-post-section">
@@ -87,6 +91,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- JavaScript Libraries -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
