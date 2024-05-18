@@ -112,9 +112,9 @@ def verify_email():
 
 
 
-@app.route('/settings')
+@app.route('/notification')
 @login_required
-def settings():
+def notification():
     # Fetch approved or rejected posts for the current user
     approved_rejected_posts = Post.query.filter_by(author_id=current_user.id).filter(Post.status.in_(['approved', 'rejected'])).all()
     
@@ -135,7 +135,7 @@ def settings():
     # Fetch unique notifications for the current user
     notifications = Notification.query.filter_by(recipient_id=current_user.id).distinct(Notification.post_id).all()
 
-    return render_template('settings.html', notifications=notifications)
+    return render_template('notification.html', notifications=notifications)
 
 
 # Add a route for handling the back button redirection
