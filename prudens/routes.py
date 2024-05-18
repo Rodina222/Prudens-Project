@@ -239,6 +239,24 @@ def delete_account():
         return redirect(url_for('home'))
 
     # Delete the user by email
+    User_k = UserRepository.get_by_email(current_user_email)
+    
+    followers = Follow.query.filter_by(follower_id=User_k.id)
+    followeds = Follow.query.filter_by(followed_id=User_k.id)
+    posts = Post.query.filter_by(author_id=User_k.id)
+    
+    for follower in followers:
+        db.session.delete(follower)
+        db.session.commit()
+        
+    for followed in followeds:
+        db.session.delete(followed)
+        db.session.commit()
+        
+    for post in posts:
+        db.session.delete(post)
+        db.session.commit()
+        
     user_to_delete = UserRepository.delete_by_email(current_user_email)
     
     if user_to_delete:
@@ -247,6 +265,7 @@ def delete_account():
         flash("Account not found", "danger")
 
     return redirect(url_for('home'))
+
 
 
 
