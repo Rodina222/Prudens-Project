@@ -254,25 +254,8 @@ def login():
                 print('after')
                 return render_template('reviewer_gui.html', posts=posts)
             elif user.user_type=='researcher' or user.user_type=='non-researcher':
-                form = PostForm()
-                if form.validate_on_submit():
-                    post_n = Post(
-                        author_id=2,
-                        reviewer_id=5,
-                        title=form.label.data,
-                        # refes=form.ref.data,
-                        content=form.post.data,
-                        status='pending')
-
-                    db.session.add(post_n)
-                    db.session.commit()
-                    # Flash a success message
-                    flash(
-                        f"post created successfully for {form.label.data}", "success")
-                    time.sleep(5)
-                    return render_template('Created ')
                 
-                return render_template('add_post.html', form=form ,current_page='add_post')
+                return redirect(url_for("home_page"))
             
             else:
                 return ('Hello , Login successfully')

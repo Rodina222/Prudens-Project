@@ -21,66 +21,17 @@
   </head>
   <body>
     <!-- Menu Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
-      <div class="container d-flex justify-content-between">
-        <!-- Left Icons -->
-        <div class="left-icons d-flex align-items-center">
-          <a href="{{ url_for('support') }}">
-            <i
-              id="support-icon"
-              class="fas fa-life-ring"
-              style="font-size: 30px; margin-right: 20px"
-            ></i
-          ></a>
-          <a href="{{ url_for('settings') }}"><i
-            id="settings-icon"
-            class="fas fa-cog"
-            style="font-size: 30px; margin-right: 20px"
-          ></i>
-        </div>
-        <!-- Center Icons -->
-        <div
-          class="menu-icons d-flex justify-content-center align-items-center"
-        >
-          <i
-            id="home-icon"
-            class="fas fa-home"
-            style="font-size: 30px; margin-right: 20px"
-          ></i>
-          <i
-            id="bell-icon"
-            class="fas fa-bell"
-            style="font-size: 30px; margin-right: 20px"
-          ></i>
-          <i
-            id="envelope-icon"
-            class="fas fa-envelope"
-            style="font-size: 30px; margin-right: 20px"
-          ></i>
-          <i
-            id="thumbtack-icon"
-            class="fas fa-thumbtack"
-            style="font-size: 30px; margin-right: 20px"
-          ></i>
-          <a href="{{ url_for('login') }}">
-          <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
-        </div>
-        <!-- Right Icon -->
-        <div class="right-icons d-flex align-items-center">
-          <a href="{{ url_for('profile') }}">
-            <i
-            id="user-icon"
-            class="fas fa-user-circle"
-            style="
-              font-size: 30px;
-              border-radius: 50%;
-              padding: 5px;
-              background-color: #f0f0f0;
-            "
-          ></i></a>
-        </div>
-      </div>
-    </nav>
+   
+<nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
+
+  <!-- Menu Icons -->
+
+  <div class="container d-flex justify-content-center">
+      <!-- Center the container -->
+      {% include 'navbar_home.html' %}
+      {% block content %}{% endblock %}
+  </div>
+</nav>
     <!-- Create Post Section -->
     <div class="container-fluid create-post-section">
       <div class="row">
