@@ -1,0 +1,49 @@
+name: Azure Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main  # Adjust branch name as needed
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Azure Login
+      uses: Azure/login@v2.1.0
+            
+
+    # Log in to Azure Container Registry
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: flaskprudensapp.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    # Build and push Docker image to Azure Container Registry
+    - name: Build and push Docker image
+      run: |
+        docker build . -t flask-app
+        docker tag flask-app flaskprudensapp.azurecr.io/flask-app:latest
+        docker push flaskprudensapp.azurecr.io/flask-app:latest
+
+    # Deploy to Azure Web App Service
+    - name: Deploy to Azure Web App Service
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: prudens  # Replace with your Azure Web App name
+        slot-name: production  # Replace with your deployment slot if applicable
+        images: |
+          flaskprudensapp.azurecr.io/flask-app:latest
+        multi-container-config-type: none  # Adjust based on your app configuration
+
+    # (Optional) Clean up Docker images on the runner
+    - name: Clean up
+      run: |
+        docker rmi flask-app
+        docker image prune -f

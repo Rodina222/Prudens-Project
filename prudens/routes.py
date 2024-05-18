@@ -3,6 +3,7 @@ from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm
 from prudens import app , bcrypt,db ,mail
 import time
+from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from flask_login import (
     login_required,
@@ -18,10 +19,25 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, cur
 
 
 @app.route('/')
-@app.route('/home')
 def home():
     form = LoginForm()
     return render_template('signIn.html', form=form)
+
+@app.route('/home')
+def home_page():
+    # Fetch pending posts from the database
+    posts = Post.query.all()
+    if not posts:
+      #  message = "There are no posts yet! Follow other users and see their posts."
+        return render_template('home_page.html')
+      # Fetch author information for each post
+    for post in posts:
+        author = User.query.get(post.author_id)
+        post.author_first_name = author.fname
+        post.author_last_name = author.lname
+    
+    return render_template('home_page.html', posts=posts)
+ 
 
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
@@ -111,14 +127,44 @@ def verify_email():
 
 
 
+@app.route('/notification')
+@login_required
+def notification():
+    # Fetch approved or rejected posts for the current user
+    approved_rejected_posts = Post.query.filter_by(author_id=current_user.id).filter(Post.status.in_(['approved', 'rejected'])).all()
+    
+    # Create notifications for approved or rejected posts if they don't exist
+    for post in approved_rejected_posts:
+        existing_notification = Notification.query.filter_by(recipient_id=current_user.id, post_id=post.id).first()
+        if not existing_notification:
+            message = f"Your post '{post.title}' has been {post.status}."
+            if post.status == 'rejected':
+                feedback = post.feedback
+                message += f" Feedback: {feedback}"
+            notification = Notification(
+                message=message,
+                recipient_id=current_user.id,
+                post_id=post.id,
+                created_on=datetime.utcnow()
+            )
+            db.session.add(notification)
+    db.session.commit()
 
-@app.route('/settings')
-def settings():
-    # Retrieve user information from the database based on the email
-    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
-    user = User.query.filter_by(email=email).first()
-    return render_template('settings.html', user=user)
+    # Fetch unique notifications for the current user including feedback from the associated post
+    notifications = []
+    for notification in Notification.query.filter_by(recipient_id=current_user.id).distinct(Notification.post_id).all():
+        post = Post.query.get(notification.post_id)
+        notifications.append({
+            'message': notification.message,
+            'created_on': notification.created_on,
+            'feedback': post.feedback if post else None  # Fetch feedback from associated post
+        })
 
+    return render_template('notification.html', notifications=notifications)
+# Add a route for handling the back button redirection
+@app.route('/back_to_add_post')
+def back_to_add_post():
+    return redirect(url_for('add_post.html'), code=302)
 
 @app.route('/update_fname', methods=['POST'])
 def update_fname():
@@ -283,7 +329,8 @@ def reject_post(post_id):
     post.feedback = feedback
     post.status = 'rejected'
     db.session.commit()
-    return "Post Rejected Successfully"
+    flash("Post rejected successfully", "success")  # Flash message for successful approval
+    return redirect(url_for('reviewer_gui'))
 
 
 @app.route('/add_post', methods=['GET', 'POST'])
@@ -316,31 +363,14 @@ def add_post():
     
     return render_template('add_post.html', form=form)
 
-    form = PostForm()
-    if form.validate_on_submit():
-        current_user_email = session.get('current_user_email')  # Retrieve user's email from session
-        current_user = User.query.filter_by(email=current_user_email).first()
-        if current_user:
-            post_n = Post(
-                author_id=current_user.id,
-                title=form.label.data,
-                content=form.post.data,
-                status='pending',
-                reference=form.ref.data  # Add this line to assign the ref attribute
-            )
-            db.session.add(post_n)
-            db.session.commit()
-            flash('Post created successfully!', 'success')
-            return redirect(url_for('add_post'))
-        else:
-            flash('User not found.', 'danger')
-    flash("Post creation failed. Please check the form.", "danger")
-    return render_template('add_post.html', form=form)
 
-
-    
-  
-
+@app.route('/settings')
+def settings():
+    # Retrieve user information from the database based on the email
+    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
+    user = User.query.filter_by(email=email).first()
+    return render_template('settings.html', user=user)
+   
 @app.route('/researchers')
 def researchers():
     researchers = Researcher.query.all()
