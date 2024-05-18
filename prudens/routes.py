@@ -1,5 +1,5 @@
 from prudens.models import User, Researcher, NonResearcher, Reviewer, Admin, Post, Comment, React, Follow, Message, Notification, Issue
-from flask import Flask, render_template, url_for, flash, redirect, request
+from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
 from prudens.forms import RegistrationForm, LoginForm, RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, support_form
 from prudens import app, bcrypt, db, mail
 import time
@@ -32,7 +32,6 @@ def home_page():
     
     return render_template('home_page.html', posts=posts,current_page='home_page')
  
-
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
 def researcher_signup():
@@ -558,3 +557,27 @@ def reply_message():
 
     # Redirect to the sent messages page if the request method is not POST
     return redirect(url_for('sent_messages'))
+
+@app.route('/search_posts', methods=['POST'])
+def search_posts():
+    data = request.get_json()
+    search_query = data.get('query', '').strip()
+    
+    if search_query:
+        search_pattern = f"%{search_query}%"
+        matching_posts = Post.query.filter(Post.content.ilike(search_pattern)).all()
+        
+        results = []
+        for post in matching_posts:
+            author = User.query.get(post.author_id)
+            highlighted_content = post.content.replace(search_query, f"<mark>{search_query}</mark>")
+            results.append({
+                'author_first_name': author.fname,
+                'author_last_name': author.lname,
+                'content': highlighted_content
+            })
+        
+        return jsonify(results)
+    
+    return jsonify([])
+
