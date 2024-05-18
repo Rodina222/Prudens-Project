@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from flask import session
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
+from prudens.repositories import UserRepository   ,NonResearcherRepository,ResearcherRepository
 
 import yagmail
 
@@ -35,14 +36,14 @@ def home_page():
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
 def researcher_signup():
-    try:
-        form = RegistrationForm()
-        if form.validate_on_submit():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        try:
             # Process the form data
             hashed_password = bcrypt.generate_password_hash(
                 form.password.data).decode('utf-8')
-
-            researcher = Researcher(
+            
+            researcher = ResearcherRepository.create_researcher(
                 fname=form.fname.data,
                 lname=form.lname.data,
                 username=form.username.data,
@@ -53,28 +54,22 @@ def researcher_signup():
                 google_scholar_account=form.google_scholar_account.data
             )
 
-            db.session.add(researcher)
-            db.session.commit()
             # Flash a success message
-            flash(
-                f"Account created successfully for {form.username.data}", "success")
+            flash(f"Account created successfully for {form.username.data}", "success")
             time.sleep(5)
             return redirect(url_for('home'))
-    except IntegrityError as e:
-        db.session.rollback()  # Rollback the session to prevent changes
-        flash('An error occurred. Please try again later.', 'error')
+        except IntegrityError as e:
+            db.session.rollback()  # Rollback the session to prevent changes
+            flash('An error occurred. Please try again later.', 'error')
+            return redirect(url_for('researcher_signup'))
 
-        return redirect(url_for('researcher_signup'))
-
-    # This part will execute only if the form is first loaded or did not pass validation
-    # If form.errors is not empty, there were validation errors
+    # Handle validation errors
     if form.errors:
         for field, errors in form.errors.items():
             for error in errors:
                 flash(f'{field}: {error}', 'danger')
 
     return render_template('researcher_sign_up.html', form=form)
-
 
 @app.route('/non_researcher_signup', methods=['GET', 'POST'])
 def non_researcher_signup():
@@ -84,7 +79,8 @@ def non_researcher_signup():
             # Process the form data
             hashed_password = bcrypt.generate_password_hash(
                 form.password.data).decode('utf-8')
-            non_researcher = NonResearcher(
+            
+            non_researcher = NonResearcherRepository.create_non_researcher(
                 fname=form.fname.data,
                 lname=form.lname.data,
                 username=form.username.data,
@@ -92,18 +88,13 @@ def non_researcher_signup():
                 password=hashed_password
             )
 
-            db.session.add(non_researcher)
-            db.session.commit()
             # Flash a success message
-
-            flash(
-                f"Account created successfully for {form.username.data}", "success")
+            flash(f"Account created successfully for {form.username.data}", "success")
             return redirect(url_for('home'))
         except IntegrityError as e:
             db.session.rollback()  # Rollback the session to prevent changes
             if 'email' in str(e):
-                flash(
-                    'Email is already registered. Please use another email address.', 'error')
+                flash('Email is already registered. Please use another email address.', 'error')
             elif 'username' in str(e):
                 flash('Username is not unique. Please choose another username.', 'error')
             else:
@@ -198,38 +189,58 @@ def Edit_post(post_id):
     return render_template('profile.html', posts=posts)
 
 @app.route('/update_fname', methods=['POST'])
+@login_required
 def update_fname():
-    # Retrieve form data
-    # Replace with the logged-in user's email
-    current_user_email = session.get('current_user_email')
-    user = User.query.filter_by(email=current_user_email).first()
-    user.fname = request.form['fname']
-    # Commit the changes to the database
-    db.session.commit()
-    return redirect(url_for('settings'))
+    # Retrieve current user's email from Flask-Login's current_user
+    current_user_email = current_user.email
 
+    # Update the user's first name
+    new_fname = request.form['fname']
+    user = UserRepository.update_fname(current_user_email, new_fname)
+    
+    if user:
+        flash("First name updated successfully", "success")
+    else:
+        flash("User not found", "danger")
+
+    return redirect(url_for('settings'))
 
 @app.route('/update_lname', methods=['POST'])
+@login_required
 def update_lname():
-    # Retrieve form data
-    # Replace with the logged-in user's email
-    current_user_email = session.get('current_user_email')
-    user = User.query.filter_by(email=current_user_email).first()
-    user.lname = request.form['lname']
-    # Commit the changes to the database
-    db.session.commit()
+    # Retrieve current user's email from Flask-Login's current_user
+    current_user_email = current_user.email
+
+    # Update the user's last name
+    new_lname = request.form['lname']
+    user = UserRepository.update_lname(current_user_email, new_lname)
+    
+    if user:
+        flash("Last name updated successfully", "success")
+    else:
+        flash("User not found", "danger")
+
     return redirect(url_for('settings'))
+
 
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
-    # Retrieve user's email from session
+    # Retrieve user's email from session
     current_user_email = session.get('current_user_email')
-    print(current_user_email)
-    user_to_delete = User.query.filter_by(email=current_user_email).first()
-    print(user_to_delete)
-    db.session.delete(user_to_delete)
-    db.session.commit()
+    if not current_user_email:
+        # Handle the case where there is no current user email in the session
+        flash("No user logged in", "danger")
+        return redirect(url_for('home'))
+
+    # Delete the user by email
+    user_to_delete = UserRepository.delete_by_email(current_user_email)
+    
+    if user_to_delete:
+        flash("Account deleted successfully", "success")
+    else:
+        flash("Account not found", "danger")
+
     return redirect(url_for('home'))
 
 
@@ -238,7 +249,7 @@ def delete_account():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = UserRepository.get_by_email(form.email.data)
 
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             # Store user's email in session
@@ -248,9 +259,9 @@ def login():
             flash(f"You have been logged in successfully", "success")
 
             if user.user_type == 'reviewer':
-                print('jhbhjhbj')
+                
                 posts = Post.query.filter_by(status='pending').all()
-                print('after')
+                
                 return render_template('reviewer_gui.html', posts=posts)
             elif user.user_type=='researcher' or user.user_type=='non-researcher':
                 
