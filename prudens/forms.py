@@ -86,3 +86,5 @@ class PostForm(FlaskForm):
     submit = SubmitField('Add')
 
 
+class support_form(FlaskForm):
+    problem = StringField("what's your issue?", validators=[DataRequired()])

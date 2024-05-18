@@ -243,6 +243,12 @@
         
           <h2>Password</h2>
           <p>******** <button class="btn">Change</button></p>
+          <h2>delete account</h2>
+          <p>
+          <form method="POST" action="{{ url_for('delete_account') }}">
+            <button type="submit" class="btn">Delete Account</button>
+          </form>
+          </p>
         </div>
       </div>
     </div>

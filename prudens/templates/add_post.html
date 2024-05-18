@@ -1,83 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home Page</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
     <!-- Add your custom styles here -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-<!-- Menu Bar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
-    <!-- Menu Icons -->
-    <div class="container d-flex justify-content-center">
-        <!-- Center the container -->
-        <div class="menu-icons d-flex justify-content-between align-items-center">
-            <!-- Center the icons -->
-            <i id="home-icon" class="fas fa-home" style="font-size: 30px; margin-right: 20px"></i>
-            <!-- Increase size and margin -->
-            <a href="{{ url_for('settings') }}">
-              <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px"></i>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Menu Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
+      <div class="container d-flex justify-content-between">
+        <!-- Left Icons -->
+        <div class="left-icons d-flex align-items-center">
+          <a href="{{ url_for('support') }}">
+          <i
+            id="support-icon"
+            class="fas fa-life-ring"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <a href="{{ url_for('settings') }}">
+          <i
+            id="settings-icon"
+            class="fas fa-cog"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+        </div>
+        <!-- Center Icons -->
+        <div
+          class="menu-icons d-flex justify-content-center align-items-center"
+        >
+          <i
+            id="home-icon"
+            class="fas fa-home"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <i
+            id="bell-icon"
+            class="fas fa-bell"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <i
+            id="envelope-icon"
+            class="fas fa-envelope"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <i
+            id="thumbtack-icon"
+            class="fas fa-thumbtack"
+            style="font-size: 30px; margin-right: 20px"
+          ></i>
+          <a href="{{ url_for('login') }}">
+          <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
           </a>
-            <!-- Increase size and margin -->
-            <i id="envelope-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px"></i>
-            <!-- Increase size and margin -->
-            <i id="thumbtack-icon" class="fas fa-thumbtack" style="font-size: 30px; margin-right: 20px"></i>
-            <!-- Increase size and margin -->
-            <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
-            <!-- Increase size -->
         </div>
-    </div>
-</nav>
-
-<!-- Create Post Section -->
-<div class="container-fluid create-post-section">
-    <div class="row">
+        <!-- Right Icon -->
+        <div class="right-icons d-flex align-items-center">
+            <a href="{{ url_for('profile') }}">
+            <i
+            id="user-icon"
+            class="fas fa-user-circle"
+            style="
+              font-size: 30px;
+              border-radius: 50%;
+              padding: 5px;
+              background-color: #f0f0f0;
+            "
+          ></i></a>
+        </div>
+      </div>
+    </nav>
+    <!-- Create Post Section -->
+    <div class="container-fluid create-post-section">
+      <div class="row">
         <div class="col-md-8 offset-md-2">
-            <form action="" method="POST">
-                {{ form.hidden_tag() }}
-                <!-- Post Field -->
-                <div class="form-group">
-                    {{ form.post.label(class='form-control-label') }}
-                    {{ form.post(class='form-control', placeholder="What's on your mind?") }}
-                </div>
-                <!-- Labels Field -->
-                <div class="form-group">
-                    {{ form.label.label(class='form-control-label') }}
-                    {{ form.label(class='form-control', placeholder="Insert Labels") }}
-                </div>
-                <!-- References Field -->
-                <div class="form-group">
-                    {{ form.ref.label(class='form-control-label') }}
-                    {{ form.ref(class='form-control', placeholder="Insert References") }}
-                </div>
-                <!-- Send Button -->
-                <div class="form-group">
-                    {{ form.submit(class='btn btn-secondary send-btn') }}
-                </div>
-                <!-- Flash messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                <div class="mt-4">
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% endwith %}
-            </form>
+          <form action="" method="POST">
+            {{ form.hidden_tag() }}
+            <!-- Post Field -->
+            <div class="form-group">
+              {{ form.post.label(class='form-control-label') }} {{
+              form.post(class='form-control', placeholder="What's on your
+              mind?") }}
+            </div>
+            <!-- Labels Field -->
+            <div class="form-group">
+              {{ form.label.label(class='form-control-label') }} {{
+              form.label(class='form-control', placeholder="Insert Labels") }}
+            </div>
+            <!-- References Field -->
+            <div class="form-group">
+              {{ form.ref.label(class='form-control-label') }} {{
+              form.ref(class='form-control', placeholder="Insert References") }}
+            </div>
+            <!-- Send Button -->
+            <div class="form-group">
+              {{ form.submit(class='btn btn-secondary send-btn') }}
+            </div>
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %}
+            <div class="mt-4">
+              {% for category, message in messages %}
+              <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %} {% endwith %}
+          </form>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- JavaScript Libraries -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-</body>
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+  </body>
 </html>
