@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,13 +7,13 @@
     <title>Setting Page UI Design</title>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&family=Nunito:wght@400;900&family=Roboto:wght@400;900&display=swap");
-  
+ 
       body {
           background: linear-gradient(to right, #626463, #eff4f5);
           overflow: hidden;
           box-sizing: border-box;
         }
-        
+       
         .container {
           background: #fff;
           width: 1140px;
@@ -23,8 +23,8 @@
           margin-top: 2%;
           box-shadow: 2px 5px 20px rgba(119, 119, 119, 0.5);
         }
-        
-        
+       
+       
         .CTA {
           width: 80px;
           height: 40px;
@@ -39,18 +39,18 @@
           transition: all 0.5s ease-in-out;
           cursor: pointer;
         }
-        
+       
         .CTA h1 {
           color: #fff;
           margin-top: 10px;
           margin-left: 9px;
         }
-        
+       
         .CTA:hover {
           background: #000706;
           transform: scale(1.1);
         }
-        
+       
         .leftbox {
           float: left;
           top: -5%;
@@ -61,7 +61,7 @@
           background: #7f837f;
           box-shadow: 3px 3px 10px rgba(119, 119, 119, 0.5);
         }
-        
+       
         nav a {
           list-style: none;
           padding: 35px;
@@ -70,41 +70,41 @@
           display: block;
           transition: all 0.3s ease-in-out;
         }
-        
+       
         nav a:hover {
           color: #3fb6a8;
           transform: scale(1.2);
           cursor: pointer;
         }
-        
+       
         nav a:first-child {
           margin-top: 7px;
         }
-        
+       
         .active {
           color: #3fb6a8;
         }
-        
+       
         .rightbox {
           float: right;
           width: 70%;
           height: 100%;
         }
-        
+       
         .profile {
           position: absolute;
           width: 70%;
         }
-        
+       
         h1 {
           font-family: "Montserrat", sans-serif;
           color: #000000;
           font-size: 24px;
           margin-top: 40px;
           margin-bottom: 35px;
-        
+       
         }
-        
+       
         h2 {
           color: #777;
           font-family: "Roboto", sans-serif;
@@ -113,9 +113,9 @@
           font-size: 16px;
           letter-spacing: 1px;
           margin-left: 2px;
-        
+       
         }
-        
+       
         p_new {
           border-width: 1px;
           border-style: solid;
@@ -128,7 +128,7 @@
           padding: 7px 0;
           color: #070707;
         }
-        
+       
         .btn {
           float: right;
           font-family: "Roboto", sans-serif;
@@ -137,12 +137,12 @@
           border: none;
           color: #3fb6a8;
         }
-        
+       
         .btn:hover {
           text-decoration: underline;
           font-weight: 900;
         }
-        
+       
         footer {
           position: absolute;
           width: 20%;
@@ -154,21 +154,21 @@
           letter-spacing: 2px;
           font-family: "Roboto", sans-serif;
         }
-        
+       
         footer p {
           border: none;
           padding: 0;
         }
-        
+       
         footer a {
           color: #fff;
           text-decoration: none;
         }
-        
+       
         footer a:hover {
           color: #7d7d7d;
         }
-        
+       
         .nav-link {
             color: #333; /* Change text color */
             font-size: 16px; /* Change font size */
@@ -178,14 +178,14 @@
             align-items: center; /* Align items vertically */
             padding: 5px 10px; /* Adjust padding as needed */
         }
-        
+       
         .nav-link i {
             margin-right: 10px; /* Add spacing between icon and text */
         }
-        
+       
         .nav-item {
             margin-right: 10px; /* Adjust the right margin */
-        } 
+        }
       </style>
     <!-- Font Awesome -->
     <link
@@ -193,15 +193,17 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
     />
     <!-- CSS -->
-    
+   
   </head>
   <body>
     <div class="container">
+
 
       <div class="leftbox">
         <nav>
           <a href="#" class="active">
             <a class="nav-link"><i class="fas fa-user"></i> Edit Personal Information</a>
+
 
           </a>
           <a href="#">
@@ -219,6 +221,7 @@
         </nav>
       </div>
 
+
       <div class="rightbox">
         <div class="profile">
           <h1>Personal Info</h1>
@@ -230,6 +233,7 @@
               </form>
             </p>
 
+
             <h2>Last Name</h2>
             <p>
               <form method="POST" action="{{ url_for('update_lname') }}">
@@ -238,9 +242,9 @@
               </form>
             </p>
           <h2>Birthday</h2>
-          
-          
-        
+         
+         
+       
           <h2>Password</h2>
           <p>******** <button class="btn">Change</button></p>
           <h2>delete account</h2>
@@ -252,6 +256,7 @@
         </div>
       </div>
     </div>
+
 
   </body>
 </html>

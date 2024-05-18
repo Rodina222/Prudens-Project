@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Send a Message{% endblock %}</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"> <!-- Font Awesome -->
+        <style>
+            .navbar-nav .nav-item.active .nav-link {
+                color: #000; /* Darker color for the active link */
+                font-weight: bold; /* Optional: make it bold */
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #ADD8E6;">
+            <a class="navbar-brand" href="#">Prudens Messaging App</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item {% if current_page == 'home_page' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('home_page') }}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item {% if current_page == 'send_message' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('send_message') }}">
+                            <i class="fas fa-envelope"></i> Send
+                        </a>
+                    </li>
+                    <li class="nav-item {% if current_page == 'received_messages' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('received_messages') }}">
+                            <i class="fas fa-inbox"></i> Inbox
+                        </a>
+                    </li>
+                    <li class="nav-item {% if current_page == 'sent_messages' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('sent_messages') }}">
+                            <i class="fas fa-paper-plane"></i> Sent
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mt-4">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
