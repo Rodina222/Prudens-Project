@@ -12,42 +12,8 @@
 </head>
 <body>
 <!-- Menu Bar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
-    <!-- Menu Icons -->
-    <div class="container d-flex justify-content-center">
-        <!-- Center the container -->
-        <div class="menu-icons d-flex justify-content-between align-items-center">
-            <!-- Center the icons -->
-            <a href="{{ url_for('home_page') }}">
-            <i id="home-icon" class="fas fa-home" style="font-size: 30px; margin-right: 20px"></i>
-            <!-- Increase size and margin -->
-            <a href="{{ url_for('settings') }}">
-              <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px"></i>
-          </a>
-            <!-- Increase size and margin -->
-           <!-- Notification Counter -->
-           <a href="{{ url_for('notification') }}" style="position: relative;">
-            <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px"></i>
-          
-            
-            <!-- Increase size and margin -->
-            <a href="{{ url_for('send_message') }}">
-                <i id="message-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px"></i>
-            </a>
-            <a href="{{ url_for('logout') }}">
-                <i class="fas fa-sign-out-alt" style="font-size: 30px; margin-right: 20px;"></i>
-            </a>
-            <!-- Increase size and margin -->
-            <i id="thumbtack-icon" class="fas fa-thumbtack" style="font-size: 30px; margin-right: 20px"></i>
-            <!-- Increase size and margin -->
-            <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
-           
-           
-            <!-- Increase size -->
-        </div>
-    </div>
-</nav>
-
+{% include 'navbar_home.html' %}
+{% block content %}{% endblock %}
 
 <!-- Create Post Section -->
 <div class="container-fluid create-post-section">

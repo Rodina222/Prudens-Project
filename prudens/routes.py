@@ -36,7 +36,7 @@ def home_page():
         post.author_first_name = author.fname
         post.author_last_name = author.lname
     
-    return render_template('home_page.html', posts=posts)
+    return render_template('home_page.html', posts=posts,current_page='home_page')
  
 
 
@@ -117,13 +117,6 @@ def non_researcher_signup():
 
     return render_template('non_researcher_sign_up.html', form=form)
 
-
-
-@app.route('/verify_email', methods=['GET'])
-def verify_email():
-    # This is a placeholder. You would typically handle the verification logic here.
-    # For example, activate the user's account based on the verification token.
-    return 'Email verified successfully!'
 
 
 
@@ -223,7 +216,7 @@ def login():
                     time.sleep(5)
                     return render_template('Created ')
                 
-                return render_template('add_post.html', form=form)
+                return render_template('add_post.html', form=form ,current_page='add_post')
             
             else:
                 return ('Hello , Login successfully')
@@ -361,7 +354,7 @@ def add_post():
                 print(f"Error in {field}: {error}")
         flash("Post creation failed. Please check the form.", "danger")
     
-    return render_template('add_post.html', form=form)
+    return render_template('add_post.html', form=form,current_page='add_post')
 
 
 @app.route('/settings')
@@ -369,7 +362,7 @@ def settings():
     # Retrieve user information from the database based on the email
     email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
     user = User.query.filter_by(email=email).first()
-    return render_template('settings.html', user=user)
+    return render_template('setting.html', user=user,current_page='settings')
    
 @app.route('/researchers')
 def researchers():
