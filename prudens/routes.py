@@ -1,20 +1,12 @@
-<<<<<<< HEAD
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, RegistrationForm_Reviewer
 from prudens import app , bcrypt,db ,mail
-=======
-from prudens.models import User, Researcher, NonResearcher, Reviewer, Admin, Post, Comment, React, Follow, Message, Notification, Issue
-from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
-from prudens.forms import RegistrationForm, LoginForm, RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, support_form
-from prudens import app, bcrypt, db, mail
->>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 import time
 from datetime import datetime
 import base64
 
 from sqlalchemy.exc import IntegrityError
-<<<<<<< HEAD
 from werkzeug.security import generate_password_hash
 from flask_login import (
     login_required,
@@ -24,8 +16,6 @@ from flask_login import (
     login_required,
 )
 
-=======
->>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 from flask import session
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
@@ -294,7 +284,6 @@ def delete_account():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-<<<<<<< HEAD
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
@@ -336,33 +325,6 @@ def login():
             else:
                 flash("Login unsuccessful. Please check the credentials", "danger")
        
-=======
-        user = UserRepository.get_by_email(form.email.data)
-
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            # Store user's email in session
-            session['current_user_email'] = form.email.data
-
-            login_user(user, remember=form.remember.data)
-            flash(f"You have been logged in successfully", "success")
-
-            if user.user_type == 'reviewer':
-                
-                posts = Post.query.filter_by(status='pending').all()
-                
-                return render_template('reviewer_gui.html', posts=posts)
-            elif user.user_type=='researcher' or user.user_type=='non-researcher':
-                
-                return redirect(url_for("home_page"))
-            
-            else:
-                return ('Hello , Login successfully')
-
-        else:
-            flash(f"Login unsuccessful. Please check the credentials", "danger")
-
-    return render_template('signIn.html', form=form)
->>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 
     return render_template('signIn.html', form=form)
 
