@@ -159,14 +159,17 @@ def back_to_add_post():
 def support():
     form = support_form()
     if form.validate_on_submit():
+        current_user_email = current_user.email
+        User_k = UserRepository.get_by_email(current_user_email)
         Issue_n = Issue(
-                content = form.problem.data
+                content = form.problem.data,
+                author_id = User_k.id
             )
         print(Issue_n.content)
         db.session.add(Issue_n)
         db.session.commit()
     return render_template('support.html', form=form)
-
+    
 @app.route('/profile')
 def profile():
     current_user_email = session.get('current_user_email')
