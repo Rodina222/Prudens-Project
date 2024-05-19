@@ -28,3 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+      - name: Run Tests
+        run: |
+          cd ./tests
+          go test -v main.go
