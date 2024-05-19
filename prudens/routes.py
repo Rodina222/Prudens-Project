@@ -1,7 +1,8 @@
-from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
+from prudens.models import User, Researcher, NonResearcher, Reviewer, Admin, Post, Comment, React, Follow, Message, Notification, Issue
+from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
+from prudens.forms import RegistrationForm, LoginForm, RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, support_form,CommentForm,RegistrationForm_Reviewer
+from prudens import app, bcrypt, db, mail
 from flask import Flask, render_template ,url_for ,flash, redirect, request
-from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, RegistrationForm_Reviewer
-from prudens import app , bcrypt,db ,mail
 import time
 from datetime import datetime
 import base64
@@ -18,6 +19,7 @@ from flask_login import (
 
 from flask import session
 from dotenv import load_dotenv
+from sqlalchemy import or_
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 from prudens.repositories import UserRepository   ,NonResearcherRepository,ResearcherRepository
 
@@ -436,6 +438,11 @@ def add_post():
     if form.validate_on_submit():
         current_user_email = session.get('current_user_email')  # Retrieve user's email from session
         current_user = User.query.filter_by(email=current_user_email).first()
+
+        if current_user.user_type != "Researcher":
+             flash('Sorry! create posts are only allowed for researchers!', 'danger')
+             return redirect(url_for('add_post'))
+
         if current_user:
             post_n = Post(
                 author_id=current_user.id,
@@ -623,6 +630,29 @@ def reply_message():
     # Redirect to the sent messages page if the request method is not POST
     return redirect(url_for('sent_messages'))
 
+@app.route('/search_posts', methods=['POST'])
+def search_posts():
+    data = request.get_json()
+    search_query = data.get('query', '').strip()
+    
+    if search_query:
+        search_pattern = f"%{search_query}%"
+        matching_posts = Post.query.filter(Post.content.ilike(search_pattern)).all()
+        
+        results = []
+        for post in matching_posts:
+            author = User.query.get(post.author_id)
+            highlighted_content = post.content.replace(search_query, f"<mark>{search_query}</mark>")
+            results.append({
+                'author_first_name': author.fname,
+                'author_last_name': author.lname,
+                'content': highlighted_content
+            })
+        
+        return jsonify(results)
+       #  return render_template('received_messages.html', messages_received=messages_received, sender_names=sender_names, sender_emails=sender_emails,current_page='received_messages')
+    
+    return jsonify([])
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     form = RegistrationForm_Reviewer()
@@ -646,3 +676,50 @@ def admin_dashboard():
         print("Form errors:", form.errors)  # Print form validation errors
     return render_template('admin.html', form=form)
 
+from sqlalchemy import or_
+
+@app.route('/search_users', methods=['POST'])
+def search_users():
+    data = request.get_json()
+    search_query = data.get('query', '').strip()
+    
+    print("Search query:", search_query)  # Add this line for debugging
+    
+    if search_query:
+        search_pattern = f"%{search_query}%"
+        matching_users = User.query.filter(or_(User.fname.ilike(search_pattern), User.lname.ilike(search_pattern))).all()
+        
+        print("Matching users:", matching_users)  # Add this line for debugging
+        
+        results = []
+        for user in matching_users:
+            highlighted_name = f"{user.fname} {user.lname}".replace(search_query, f"<mark>{search_query}</mark>")
+            results.append({
+                'firstname': user.fname,
+                'lastname': user.lname,
+                'highlighted_name': highlighted_name
+            })
+        
+        return jsonify(results)
+    
+    return jsonify([])
+
+@app.route('/add_comment', methods=['POST', 'GET'])
+def add_comment():
+    form = CommentForm()
+    print(request.form)  # Print incoming form data
+
+    if form.validate_on_submit():
+        post_id = request.form.get('post_id')
+        comment_content = request.form.get('comment')
+        print(comment_content)
+
+        if post_id and comment_content:
+            new_comment = Comment(content=comment_content, post_id=post_id, user_id=current_user.id)
+            db.session.add(new_comment)
+            db.session.commit()
+            flash("Comment added successfully!", "success")
+            return redirect(url_for('home_page'))
+    flash("Failed to add comment. Please check the form.", "danger")
+    return redirect(url_for('home_page'))
+      
