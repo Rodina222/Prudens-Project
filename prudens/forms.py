@@ -102,6 +102,7 @@ class ResetPasswordForm(FlaskForm):
         "Confirm Password", validators=[DataRequired(), EqualTo("password")]
     )
     submit = SubmitField("Reset Password")
+<<<<<<< HEAD
 
 
 class RegistrationForm_Reviewer(FlaskForm):
@@ -128,3 +129,7 @@ class RegistrationForm_Reviewer(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError("Email already exists! Please choose a different one")
+=======
+class support_form(FlaskForm):
+    problem = StringField("what's your issue?", validators=[DataRequired()])
+>>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c

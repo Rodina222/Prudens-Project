@@ -1,12 +1,20 @@
+<<<<<<< HEAD
 from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
 from flask import Flask, render_template ,url_for ,flash, redirect, request
 from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, RegistrationForm_Reviewer
 from prudens import app , bcrypt,db ,mail
+=======
+from prudens.models import User, Researcher, NonResearcher, Reviewer, Admin, Post, Comment, React, Follow, Message, Notification, Issue
+from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
+from prudens.forms import RegistrationForm, LoginForm, RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, support_form
+from prudens import app, bcrypt, db, mail
+>>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 import time
 from datetime import datetime
 import base64
 
 from sqlalchemy.exc import IntegrityError
+<<<<<<< HEAD
 from werkzeug.security import generate_password_hash
 from flask_login import (
     login_required,
@@ -16,9 +24,14 @@ from flask_login import (
     login_required,
 )
 
+=======
+>>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 from flask import session
-from dotenv import load_dotenv  
+from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
+from prudens.repositories import UserRepository   ,NonResearcherRepository,ResearcherRepository
+
+import yagmail
 
 
 @app.route('/')
@@ -39,45 +52,39 @@ def home_page():
         post.author_first_name = author.fname
         post.author_last_name = author.lname
     
-    return render_template('home_page.html', posts=posts)
+    return render_template('home_page.html', posts=posts,current_page='home_page')
  
-
 
 @app.route('/researcher_signup', methods=['GET', 'POST'])
 def researcher_signup():
-    try:
-        form = RegistrationForm()
-        if form.validate_on_submit():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        try:
             # Process the form data
-            hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-
-            researcher=Researcher(
-            fname=form.fname.data,
-            lname=form.lname.data,
-            username=form.username.data,
-            email=form.email.data,
-            password=hashed_password,
-            field_of_study=form.field_of_study.data,
-            linkedin_account=form.linkedin_account.data,
-            google_scholar_account=form.google_scholar_account.data
+            hashed_password = bcrypt.generate_password_hash(
+                form.password.data).decode('utf-8')
+            
+            researcher = ResearcherRepository.create_researcher(
+                fname=form.fname.data,
+                lname=form.lname.data,
+                username=form.username.data,
+                email=form.email.data,
+                password=hashed_password,
+                field_of_study=form.field_of_study.data,
+                linkedin_account=form.linkedin_account.data,
+                google_scholar_account=form.google_scholar_account.data
             )
 
-            db.session.add(researcher)
-            db.session.commit()
             # Flash a success message
             flash(f"Account created successfully for {form.username.data}", "success")
             time.sleep(5)
             return redirect(url_for('home'))
-    except IntegrityError as e:
-        db.session.rollback()  # Rollback the session to prevent changes
-        flash('An error occurred. Please try again later.', 'error')
+        except IntegrityError as e:
+            db.session.rollback()  # Rollback the session to prevent changes
+            flash('An error occurred. Please try again later.', 'error')
+            return redirect(url_for('researcher_signup'))
 
-        return redirect(url_for('researcher_signup'))
-
-
-
-    # This part will execute only if the form is first loaded or did not pass validation
-    # If form.errors is not empty, there were validation errors
+    # Handle validation errors
     if form.errors:
         for field, errors in form.errors.items():
             for error in errors:
@@ -85,16 +92,16 @@ def researcher_signup():
 
     return render_template('researcher_sign_up.html', form=form)
 
-
-
 @app.route('/non_researcher_signup', methods=['GET', 'POST'])
 def non_researcher_signup():
     form = RegistrationForm_Non()
     if form.validate_on_submit():
         try:
             # Process the form data
-            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-            non_researcher = NonResearcher(
+            hashed_password = bcrypt.generate_password_hash(
+                form.password.data).decode('utf-8')
+            
+            non_researcher = NonResearcherRepository.create_non_researcher(
                 fname=form.fname.data,
                 lname=form.lname.data,
                 username=form.username.data,
@@ -102,10 +109,7 @@ def non_researcher_signup():
                 password=hashed_password
             )
 
-            db.session.add(non_researcher)
-            db.session.commit()
             # Flash a success message
-
             flash(f"Account created successfully for {form.username.data}", "success")
             return redirect(url_for('home'))
         except IntegrityError as e:
@@ -119,14 +123,6 @@ def non_researcher_signup():
             return redirect(url_for('non_researcher_signup'))
 
     return render_template('non_researcher_sign_up.html', form=form)
-
-
-
-@app.route('/verify_email', methods=['GET'])
-def verify_email():
-    # This is a placeholder. You would typically handle the verification logic here.
-    # For example, activate the user's account based on the verification token.
-    return 'Email verified successfully!'
 
 
 
@@ -169,30 +165,136 @@ def notification():
 def back_to_add_post():
     return redirect(url_for('add_post.html'), code=302)
 
+@app.route('/support', methods=['GET', 'POST'])
+def support():
+    form = support_form()
+    if form.validate_on_submit():
+        Issue_n = Issue(
+                content = form.problem.data
+            )
+        print(Issue_n.content)
+        db.session.add(Issue_n)
+        db.session.commit()
+    return render_template('support.html', form=form)
+
+@app.route('/profile')
+def profile():
+    current_user_email = session.get('current_user_email')
+    print(current_user_email)
+    user = User.query.filter_by(email=current_user_email).first()
+    print(user.id)
+    posts = Post.query.filter_by(author_id=user.id).filter_by(status='approved').all()
+    print(posts)
+    return render_template('profile.html', posts=posts)
+
+@app.route('/delete_post/<int:post_id>', methods=['GET', 'POST'])
+def delete_post(post_id):
+    print(post_id)
+    notification_to_delete = Notification.query.filter_by(post_id=post_id).first()
+    if notification_to_delete:
+        print(notification_to_delete)
+        db.session.delete(notification_to_delete)
+        db.session.commit()
+    
+    post_to_delete = Post.query.filter_by(id=post_id).first()
+    if post_to_delete:
+        print(post_to_delete)
+        db.session.delete(post_to_delete)
+        db.session.commit()
+    
+    current_user_email = session.get('current_user_email')
+    user = User.query.filter_by(email=current_user_email).first()
+    posts = Post.query.filter_by(author_id=user.id).filter_by(status='approved').all()
+    return render_template('profile.html', posts=posts)
+
+@app.route('/Edit_post/<int:post_id>')
+def Edit_post(post_id):
+    current_user_email = session.get('current_user_email')
+    user = User.query.filter_by(email=current_user_email).first()
+    posts = Post.query.filter_by(author_id=user.id).filter_by(status='approved').all()
+    return render_template('profile.html', posts=posts)
+
 @app.route('/update_fname', methods=['POST'])
+@login_required
 def update_fname():
-    # Retrieve form data
-    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
-    user = User.query.filter_by(email=email).first()
-    user.fname = request.form['fname']
-    # Commit the changes to the database
-    db.session.commit()
-    return 'User information updated successfully'
+    # Retrieve current user's email from Flask-Login's current_user
+    current_user_email = current_user.email
+
+    # Update the user's first name
+    new_fname = request.form['fname']
+    user = UserRepository.update_fname(current_user_email, new_fname)
+    
+    if user:
+        flash("First name updated successfully", "success")
+    else:
+        flash("User not found", "danger")
+
+    return redirect(url_for('settings'))
 
 @app.route('/update_lname', methods=['POST'])
+@login_required
 def update_lname():
-    # Retrieve form data
-    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
-    user = User.query.filter_by(email=email).first()
-    user.fname = request.form['lname']
-    # Commit the changes to the database
-    db.session.commit()
-    return 'User information updated successfully'
+    # Retrieve current user's email from Flask-Login's current_user
+    current_user_email = current_user.email
+
+    # Update the user's last name
+    new_lname = request.form['lname']
+    user = UserRepository.update_lname(current_user_email, new_lname)
+    
+    if user:
+        flash("Last name updated successfully", "success")
+    else:
+        flash("User not found", "danger")
+
+    return redirect(url_for('settings'))
+
+
+
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    # Retrieve user's email from session
+    current_user_email = session.get('current_user_email')
+    if not current_user_email:
+        # Handle the case where there is no current user email in the session
+        flash("No user logged in", "danger")
+        return redirect(url_for('home'))
+
+    # Delete the user by email
+    User_k = UserRepository.get_by_email(current_user_email)
+    
+    followers = Follow.query.filter_by(follower_id=User_k.id)
+    followeds = Follow.query.filter_by(followed_id=User_k.id)
+    posts = Post.query.filter_by(author_id=User_k.id)
+    
+    for follower in followers:
+        db.session.delete(follower)
+        db.session.commit()
+        
+    for followed in followeds:
+        db.session.delete(followed)
+        db.session.commit()
+        
+    for post in posts:
+        db.session.delete(post)
+        db.session.commit()
+        
+    user_to_delete = UserRepository.delete_by_email(current_user_email)
+    
+    if user_to_delete:
+        flash("Account deleted successfully", "success")
+    else:
+        flash("Account not found", "danger")
+
+    return redirect(url_for('home'))
+
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+<<<<<<< HEAD
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
@@ -234,19 +336,44 @@ def login():
             else:
                 flash("Login unsuccessful. Please check the credentials", "danger")
        
+=======
+        user = UserRepository.get_by_email(form.email.data)
+
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            # Store user's email in session
+            session['current_user_email'] = form.email.data
+
+            login_user(user, remember=form.remember.data)
+            flash(f"You have been logged in successfully", "success")
+
+            if user.user_type == 'reviewer':
+                
+                posts = Post.query.filter_by(status='pending').all()
+                
+                return render_template('reviewer_gui.html', posts=posts)
+            elif user.user_type=='researcher' or user.user_type=='non-researcher':
+                
+                return redirect(url_for("home_page"))
+            
+            else:
+                return ('Hello , Login successfully')
+
+        else:
+            flash(f"Login unsuccessful. Please check the credentials", "danger")
+
+    return render_template('signIn.html', form=form)
+>>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 
     return render_template('signIn.html', form=form)
 
-@app.route('/logout',methods=['GET'])
+@app.route('/logout', methods=['GET'])
 def logout():
-
     session.pop('current_user_email', None)  # Remove user's email from session
     current_user_email = session.get('current_user_email')  # Retrieve user's email from session
     print(current_user_email)
     form = LoginForm()
     return render_template('signIn.html', form=form)
-    
- 
+
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def reset_request():
@@ -298,6 +425,7 @@ def reviewer_gui():
         return render_template('reviewer_gui.html', message=message)
     return render_template('reviewer_gui.html', posts=posts)
 
+
 @app.route('/review_post/<int:post_id>', methods=['POST'])
 def review_post(post_id):
     # Logic to handle review of the post
@@ -315,6 +443,7 @@ def review_post(post_id):
     db.session.commit()
     flash("Post approved successfully", "success")  # Flash message for successful approval
     return redirect(url_for('reviewer_gui'))
+
 
 @app.route('/reject_post/<int:post_id>', methods=['POST'])
 def reject_post(post_id):
@@ -363,70 +492,75 @@ def add_post():
                 print(f"Error in {field}: {error}")
         flash("Post creation failed. Please check the form.", "danger")
     
-    return render_template('add_post.html', form=form)
+    return render_template('add_post.html', form=form,current_page='add_post')
 
 
 @app.route('/settings')
 def settings():
     # Retrieve user information from the database based on the email
-    email = 's-mariam.abouzaid@zewailcity.edu.eg'  # Replace with the logged-in user's email
-    user = User.query.filter_by(email=email).first()
-    return render_template('settings.html', user=user)
+    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+    user = User.query.filter_by(email=current_user_email).first()
+    return render_template('setting.html', user=user,current_page='settings')
    
-@app.route('/researchers')
-def researchers():
-    researchers = Researcher.query.all()
-    return render_template('follow.html', researchers=researchers)
-
 
 
 @app.route('/follow_researcher/<int:researcher_id>', methods=['POST'])
 def follow_researcher(researcher_id):
-    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+    # Retrieve user's email from session
+    current_user_email = session.get('current_user_email')
     if not current_user_email:
         flash('You must be logged in to follow researchers.', 'danger')
-        return redirect(url_for('researchers'))
+        return redirect(url_for('home_page'))
     researcher = Researcher.query.get_or_404(researcher_id)
     current_user = User.query.filter_by(email=current_user_email).first()
 
     if current_user.id == researcher.id:
         flash('You cannot follow yourself.', 'danger')
-        return redirect(url_for('researchers'))
+        return redirect(url_for('home_page'))
     # Check if the current user is already following the researcher
     if Follow.query.filter_by(follower_id=current_user.id, followed_id=researcher.id).first():
-        flash(f'You are already following {researcher.fname} {researcher.lname}.', 'info')
-        return redirect(url_for('researchers'))
+        flash(
+            f'You are already following {researcher.fname} {researcher.lname}.', 'info')
+        return redirect(url_for('home_page'))
 
     # Create a new Follow relationship
     follow = Follow(follower_id=current_user.id, followed_id=researcher.id)
     db.session.add(follow)
     db.session.commit()
 
-    flash(f'You are now following {researcher.fname} {researcher.lname}.', 'success')
-    return redirect(url_for('researchers'))
+    flash(
+        f'You are now following {researcher.fname} {researcher.lname}.', 'success')
+    return redirect(url_for('home_page'))
 
 
 @app.route('/unfollow_researcher/<int:researcher_id>', methods=['POST'])
 def unfollow_researcher(researcher_id):
-    current_user_email = session.get('current_user_email')  # Retrieve user's email from session
+    # Retrieve user's email from session
+    current_user_email = session.get('current_user_email')
     if not current_user_email:
         flash('You must be logged in to follow researchers.', 'danger')
-        return redirect(url_for('researchers'))
+        return redirect(url_for('home_page'))
 
     researcher = Researcher.query.get_or_404(researcher_id)
     current_user = User.query.filter_by(email=current_user_email).first()
 
     # Check if the current user is already following the researcher
-    existing_follow = Follow.query.filter_by(follower_id=current_user.id, followed_id=researcher.id).first()
-    if existing_follow:
+    existing_follow = Follow.query.filter_by(
+        follower_id=current_user.id, followed_id=researcher.id).first()
+    if current_user.id == researcher.id:
+        flash('You cannot unfollow yourself.', 'danger')
+        return redirect(url_for('home_page'))
+    elif existing_follow:
         # Delete the existing follow relationship
         db.session.delete(existing_follow)
         db.session.commit()
-        flash(f'You have unfollowed {researcher.fname} {researcher.lname}.', 'info')
+        flash(
+            f'You have unfollowed {researcher.fname} {researcher.lname}.', 'info')
     else:
-        flash(f'You are not following {researcher.fname} {researcher.lname}.', 'success')
+        flash(
+            f'You are not following {researcher.fname} {researcher.lname}.', 'success')
 
-    return redirect(url_for('researchers'))
+    return redirect(url_for('home_page'))
 
 
 #@app.route('/')
@@ -524,6 +658,7 @@ def reply_message():
     # Redirect to the sent messages page if the request method is not POST
     return redirect(url_for('sent_messages'))
 
+<<<<<<< HEAD
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     form = RegistrationForm_Reviewer()
@@ -546,4 +681,28 @@ def admin_dashboard():
     else:
         print("Form errors:", form.errors)  # Print form validation errors
     return render_template('admin.html', form=form)
+=======
+@app.route('/search_posts', methods=['POST'])
+def search_posts():
+    data = request.get_json()
+    search_query = data.get('query', '').strip()
+    
+    if search_query:
+        search_pattern = f"%{search_query}%"
+        matching_posts = Post.query.filter(Post.content.ilike(search_pattern)).all()
+        
+        results = []
+        for post in matching_posts:
+            author = User.query.get(post.author_id)
+            highlighted_content = post.content.replace(search_query, f"<mark>{search_query}</mark>")
+            results.append({
+                'author_first_name': author.fname,
+                'author_last_name': author.lname,
+                'content': highlighted_content
+            })
+        
+        return jsonify(results)
+    
+    return jsonify([])
+>>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 

@@ -9,55 +9,79 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Add your custom styles here -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Additional Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007bff;
+        }
+
+        .researcher-item {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .follow-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;  /* Smaller padding */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;  /* Smaller font size */
+        }
+
+        .follow-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .author-buttons {
+            display: flex;
+            gap: 5px;  /* Smaller gap */
+            margin-left: auto;  /* Push buttons to the right */
+        }
+
+        .emotion-buttons {
+            display: none;
+        }
+
+        .author-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-name {
+            flex-grow: 1;
+        }
+    </style>
 </head>
 <body>
 <!-- Menu Bar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light menu-bar">
-
-    <!-- Menu Icons -->
-    <div class="settings-icon">
-        <a href="{{ url_for('settings') }}"></a>
-            <i id="settings-icon" class="fas fa-cog"></i>
-        
-    </div>
-
     <div class="container d-flex justify-content-center">
-        <!-- Center the container -->
-        <div class="menu-icons d-flex justify-content-between align-items-center">
-            <!-- Center the icons -->
-            <a href="{{ url_for('home_page') }}">
-            <i id="home-icon" class="fas fa-home" style="font-size: 30px; margin-right: 20px"></i>
-            </a>
-            <!-- Increase size and margin -->
-            <a href="{{ url_for('settings') }}"></a>
-              <i id="bell-icon" class="fas fa-bell" style="font-size: 30px; margin-right: 20px"></i>
-          
-            <!-- Increase size and margin -->
-            
-            <a href="{{ url_for('send_message') }}">  </a>
-                <i id="message-icon" class="fas fa-envelope" style="font-size: 30px; margin-right: 20px"></i>
-          
-
-            <a href="{{ url_for('logout') }}">  </a>
-                <i class="fas fa-sign-out-alt" style="font-size: 30px; margin-right: 20px;"></i>
-
-                       
-            
-            <!-- Increase size and margin -->
-            <i id="thumbtack-icon" class="fas fa-thumbtack" style="font-size: 30px; margin-right: 20px"></i>
-            <!-- Increase size and margin -->
-            <i id="plus-icon" class="fas fa-plus" style="font-size: 30px"></i>
-            
-            
-            <!-- Increase size -->
-        </div>
+        {% include 'navbar_home.html' %}
+        {% block content %}{% endblock %}
     </div>
 </nav>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-8"> <!-- Adjust the width as needed -->
-            <!-- Render the username dynamically -->
+        <div class="col-md-8">
             <h1>Welcome, {{ current_user.username }}!</h1>
             <h2>Let's Discover New Posts!</h2>
             <div class="list-group">
@@ -65,8 +89,16 @@
                 <a href="#" class="list-group-item list-group-item-action">
                     <div class="post-container">
                         <div class="author-info">
-                            <div class="author-name">
-                                <div class="author-box">{{ post.author_first_name }} {{ post.author_last_name }}</div>
+                            <div class="author-box">
+                                <div class="author-name">{{ post.author_first_name }} {{ post.author_last_name }}</div>
+                                <div class="author-buttons">
+                                    <form method="POST" action="{{ url_for('follow_researcher', researcher_id=post.author_id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-primary follow-btn">Follow</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('unfollow_researcher', researcher_id=post.author_id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-secondary follow-btn">Unfollow</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         <p class="post-content">{{ post.content }}</p>
@@ -74,10 +106,9 @@
                             <input type="text" class="comment-input" placeholder="Write a comment...">
                             <button type="submit" class="submit-btn"><i class="fas fa-arrow-right"></i></button>
                         </div>
-                        <!-- <button type="button" class="btn btn-primary react-btn">React <i class="fas fa-smile"></i></button> -->
                         <div class="action-buttons">
                             <button type="button" class="btn btn-primary react-btn">React <i class="fas fa-smile"></i></button>
-                            <button type="button" class="btn btn-secondary share-btn">Share <i class="fas fa-share"></i></button>       
+                            <button type="button" class="btn btn-secondary share-btn">Share <i class="fas fa-share"></i></button>
                         </div>
                         <div class="emotion-buttons">
                             <button class="emotion-button happy">😊 Happy</button>
@@ -85,8 +116,6 @@
                             <button class="emotion-button angry">😠 Angry</button>
                             <button class="emotion-button excited">😄 Excited</button>
                         </div>
-                       
-                        <!-- <button type="button" class="btn btn-secondary share-btn">Share <i class="fas fa-share"></i></button> -->
                     </div>
                 </a>
                 {% endfor %}
@@ -120,7 +149,6 @@
 <!-- JavaScript Libraries -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.react-btn').forEach(function(button) {
@@ -164,9 +192,8 @@
                 document.querySelectorAll('.submit-btn').forEach(btn => btn.classList.remove('active-btn'));
             }
         });
-        
     });
-    
+
     function highlightAuthor(element) {
         element.style.backgroundColor = 'blue';
     }

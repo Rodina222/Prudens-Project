@@ -1,256 +1,218 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setting Page UI Design</title>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&family=Nunito:wght@400;900&family=Roboto:wght@400;900&display=swap");
- 
-      body {
-          background: linear-gradient(to right, #626463, #eff4f5);
-          overflow: hidden;
-          box-sizing: border-box;
+        /* Integrated Styles */
+        @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&family=Nunito:wght@400;900&family=Roboto:wght@400;900&display=swap");
+
+        body {
+            background: linear-gradient(to right, #626463, #eff4f5);
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden; /* Ensure horizontal overflow is hidden */
+            box-sizing: border-box;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
         }
-       
+
         .container {
-          background: #fff;
-          width: 1140px;
-          height: 520px;
-          margin: 0 auto;
-          position: relative;
-          margin-top: 2%;
-          box-shadow: 2px 5px 20px rgba(119, 119, 119, 0.5);
+            background: #fff;
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 2px 5px 20px rgba(119, 119, 119, 0.5);
+            max-height: 80vh; /* Set maximum height for scrollability */
+            overflow-y: auto; /* Enable vertical scrolling */
         }
-       
-       
-        .CTA {
-          width: 80px;
-          height: 40px;
-          right: -20px;
-          bottom: 0;
-          margin-bottom: 90px;
-          position: absolute;
-          z-index: 1;
-          background: #7ed386;
-          font-size: 1em;
-          transform: rotate(-90deg);
-          transition: all 0.5s ease-in-out;
-          cursor: pointer;
+
+        nav {
+            position: fixed;
+            width: 20%;
+            height: 100%;
+            background: #3fb6a8;
+            padding-top: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; /* Enable scrolling for nav */
         }
-       
-        .CTA h1 {
-          color: #fff;
-          margin-top: 10px;
-          margin-left: 9px;
-        }
-       
-        .CTA:hover {
-          background: #000706;
-          transform: scale(1.1);
-        }
-       
-        .leftbox {
-          float: left;
-          top: -5%;
-          left: 5%;
-          position: absolute;
-          width: 15%;
-          height: 110%;
-          background: #7f837f;
-          box-shadow: 3px 3px 10px rgba(119, 119, 119, 0.5);
-        }
-       
+
         nav a {
-          list-style: none;
-          padding: 35px;
-          color: #fff;
-          font-size: 1.1em;
-          display: block;
-          transition: all 0.3s ease-in-out;
+            list-style: none;
+            padding: 10px;
+            color: #fff;
+            font-size: 16px;
+            display: block;
+            transition: all 0.3s ease-in-out;
+            text-decoration: none;
+            font-weight: bold;
         }
-       
+
         nav a:hover {
-          color: #3fb6a8;
-          transform: scale(1.2);
-          cursor: pointer;
+            color: #fff;
+            background: #1c7f73;
+            cursor: pointer;
         }
-       
-        nav a:first-child {
-          margin-top: 7px;
-        }
-       
+
         .active {
-          color: #3fb6a8;
+            background: #1c7f73;
         }
-       
+
         .rightbox {
-          float: right;
-          width: 70%;
-          height: 100%;
+            margin-left: 20%; /* Adjust margin to accommodate fixed nav */
+            padding: 20px;
+            color: #000;
+            box-sizing: border-box;
         }
-       
+
         .profile {
-          position: absolute;
-          width: 70%;
+            padding: 20px;
+            color: #000;
         }
-       
+
         h1 {
-          font-family: "Montserrat", sans-serif;
-          color: #000000;
-          font-size: 24px;
-          margin-top: 40px;
-          margin-bottom: 35px;
-       
+            font-family: 'Montserrat', sans-serif;
+            color: #000;
+            font-size: 24px;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
-       
+
         h2 {
-          color: #777;
-          font-family: "Roboto", sans-serif;
-          width: 80%;
-          text-transform: uppercase;
-          font-size: 16px;
-          letter-spacing: 1px;
-          margin-left: 2px;
-       
+            color: #777;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            margin-top: 15px;
+            margin-bottom: 10px;
         }
-       
-        p_new {
-          border-width: 1px;
-          border-style: solid;
-          border-image: linear-gradient(to right, #3fb6a8, rgba(126, 211, 134, 0.5)) 1
-            0%;
-          border-top: 0;
-          width: 80%;
-          font-family: "Montserrat", sans-serif;
-          font-size: 0.7em;
-          padding: 7px 0;
-          color: #070707;
+
+        p {
+            margin-bottom: 20px;
         }
-       
+
+        input[type="text"], input[type="password"] {
+            width: 60%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
         .btn {
-          float: right;
-          font-family: "Roboto", sans-serif;
-          text-transform: uppercase;
-          font-size: 14px;
-          border: none;
-          color: #3fb6a8;
+            font-family: 'Roboto', sans-serif;
+            text-transform: uppercase;
+            font-size: 14px;
+            border: none;
+            background-color: #3fb6a8;
+            color: #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 4px;
         }
-       
+
         .btn:hover {
-          text-decoration: underline;
-          font-weight: 900;
+            background-color: #1c7f73;
         }
-       
+
         footer {
-          position: absolute;
-          width: 20%;
-          bottom: 0;
-          right: -20px;
-          text-align: right;
-          font-size: 0.8em;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          font-family: "Roboto", sans-serif;
+            text-align: right;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Roboto', sans-serif;
+            color: #ccc;
+            position: fixed;
+            bottom: 0;
+            right: 20px;
+            background-color: #3fb6a8;
+            padding: 5px 10px;
         }
-       
-        footer p {
-          border: none;
-          padding: 0;
-        }
-       
+
         footer a {
-          color: #fff;
-          text-decoration: none;
+            color: #fff;
+            text-decoration: none;
         }
-       
+
         footer a:hover {
-          color: #7d7d7d;
+            color: #7d7d7d;
         }
-       
+
         .nav-link {
-            color: #333; /* Change text color */
-            font-size: 16px; /* Change font size */
-            font-weight: bold; /* Make text bold */
-            text-decoration: none; /* Remove underline */
-            display: flex; /* Use flexbox for alignment */
-            align-items: center; /* Align items vertically */
-            padding: 5px 10px; /* Adjust padding as needed */
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
         }
-       
+
         .nav-link i {
-            margin-right: 10px; /* Add spacing between icon and text */
+            margin-right: 10px;
         }
-       
+
         .nav-item {
-            margin-right: 10px; /* Adjust the right margin */
+            margin-right: 10px;
         }
-      </style>
+        h2 {
+    color: #000; /* Change text color to black */
+    font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+    </style>
     <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-    />
-    <!-- CSS -->
-   
-  </head>
-  <body>
-    <div class="container">
-
-
-      <div class="leftbox">
-        <nav>
-          <a href="#" class="active">
-            <a class="nav-link"><i class="fas fa-user"></i> Edit Personal Information</a>
-
-
-          </a>
-          <a href="#">
-            <a class="nav-link" href="#"><i class="fas fa-bell"></i> Notifications</a>
-          </a>
-          <a href="#">
-            <a class="nav-link" href="#"><i class="fas fa-paint-brush"></i> Appearance</a>
-          </a>
-          <a href="#">
-            <a class="nav-link" href="#"><i class="fas fa-question-circle"></i> Help</a>
-          </a>
-          <a href="#" >
-            <a class="nav-link" href="{{ url_for('logout')}}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-          </a>
-        </nav>
-      </div>
-
-
-      <div class="rightbox">
-        <div class="profile">
-          <h1>Personal Info</h1>
-          <h2>First Name</h2>
-            <p>
-              <form method="POST" action="{{ url_for('update_fname') }}">
-                <input type="text" name="fname" value="{{ user.fname }}" required style="border: none;">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+<nav>
+    <a href="#" class="active">
+        <a class="nav-link"><i class="fas fa-user"></i> Edit Personal Information</a>
+    </a>
+    <a href="#">
+        <a class="nav-link" href="#"><i class="fas fa-bell"></i> Notifications</a>
+    </a>
+    <a href="#">
+        <a class="nav-link" href="#"><i class="fas fa-paint-brush"></i> Appearance</a>
+    </a>
+    <a href="#">
+        <a class="nav-link" href="#"><i class="fas fa-question-circle"></i> Help</a>
+    </a>
+    <a href="#">
+        <a class="nav-link" href="{{ url_for('logout')}}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </a>
+</nav>
+<div class="rightbox">
+    <div class="profile">
+        <h1>Personal Info</h1>
+        <h2>First Name</h2>
+        <p>
+            <form method="POST" action="{{ url_for('update_fname') }}">
+                <input type="text" name="fname" value="{{ user.fname }}" required>
                 <button type="submit" class="btn">Update</button>
-              </form>
-            </p>
-
-
-            <h2>Last Name</h2>
-            <p>
-              <form method="POST" action="{{ url_for('update_lname') }}">
-                <input type="text" name="fname" value="{{ user.lname }}" required style="border: none;">
+            </form>
+        </p>
+        <h2>Last Name</h2>
+        <p>
+            <form method="POST" action="{{ url_for('update_lname') }}">
+                <input type="text" name="lname" value="{{ user.lname }}" required>
                 <button type="submit" class="btn">Update</button>
-              </form>
-            </p>
-          <h2>Birthday</h2>
-         
-         
-       
-          <h2>Password</h2>
-          <p>******** <button class="btn">Change</button></p>
-        </div>
-      </div>
+            </form>
+        </p>
+        
+        <h2>Password</h2>
+        <p>******** <button class="btn">Change</button></p>
+        <h2>Delete Account</h2>
+        <p>
+            <form method="POST" action="{{ url_for('delete_account') }}">
+                <button type="submit" class="btn">Delete Account</button>
+            </form>
+        </p>
     </div>
-
-
-  </body>
+    
+</div>
+</body>
 </html>
