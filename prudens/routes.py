@@ -324,7 +324,7 @@ def login():
                         time.sleep(5)
                         return render_template('Created')
 
-                    return render_template('add_post.html', form=form)
+                    return redirect(url_for('home_page'))
                 else:
                     return "Hello, Login successfully"
             else:
