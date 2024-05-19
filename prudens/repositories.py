@@ -12,6 +12,8 @@ class UserRepository:
         db.session.add(user)
         db.session.commit()
         return user
+
+
     @staticmethod    
     def delete_by_email(email):
         user = User.query.filter_by(email=email).first()
@@ -36,8 +38,8 @@ class UserRepository:
             db.session.commit()
         return user
 
-
 class NonResearcherRepository:
+
     @staticmethod
     def create_non_researcher(fname, lname, username, email, password):
         non_researcher = NonResearcher(
@@ -50,7 +52,9 @@ class NonResearcherRepository:
         db.session.add(non_researcher)
         db.session.commit()
         return non_researcher
+
 class ResearcherRepository:
+
     @staticmethod
     def create_researcher(fname, lname, username, email, password, field_of_study, linkedin_account, google_scholar_account):
         researcher = Researcher(

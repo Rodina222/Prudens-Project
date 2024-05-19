@@ -17,9 +17,6 @@ class TestResearcherAuth(unittest.TestCase):
         # Create a temporary researcher for testing
         with app.app_context():
             db.create_all()
-    
-
-
 
     def test_researcher_signup(self):
         # Test researcher signup
@@ -54,7 +51,6 @@ class TestResearcherAuth(unittest.TestCase):
         print("================",response.data)
         self.assertEqual(response.status_code, 200)
         
-
     def test_researcher_login(self):
     # Test researcher login
 

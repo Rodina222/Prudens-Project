@@ -48,7 +48,6 @@ class TestUIResetPassword(unittest.TestCase):
 
         self.assertIn("Sign In / Sign Up", driver.title)
 
-
     def test_researcher_signup(self):
         driver = self.driver
         driver.get(f"{self.base_url}/researcher_signup")
