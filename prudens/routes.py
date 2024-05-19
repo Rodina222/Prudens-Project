@@ -1,12 +1,25 @@
 from prudens.models import User, Researcher, NonResearcher, Reviewer, Admin, Post, Comment, React, Follow, Message, Notification, Issue
 from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
-from prudens.forms import RegistrationForm, LoginForm, RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, support_form
+from prudens.forms import RegistrationForm, LoginForm, RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, support_form,CommentForm,RegistrationForm_Reviewer
 from prudens import app, bcrypt, db, mail
+from flask import Flask, render_template ,url_for ,flash, redirect, request
 import time
 from datetime import datetime
+import base64
+
 from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
+from flask_login import (
+    login_required,
+    login_user,
+    current_user,
+    logout_user,
+    login_required,
+)
+
 from flask import session
 from dotenv import load_dotenv
+from sqlalchemy import or_
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 from prudens.repositories import UserRepository   ,NonResearcherRepository,ResearcherRepository
 
@@ -148,14 +161,17 @@ def back_to_add_post():
 def support():
     form = support_form()
     if form.validate_on_submit():
+        current_user_email = current_user.email
+        User_k = UserRepository.get_by_email(current_user_email)
         Issue_n = Issue(
-                content = form.problem.data
+                content = form.problem.data,
+                author_id = User_k.id
             )
         print(Issue_n.content)
         db.session.add(Issue_n)
         db.session.commit()
     return render_template('support.html', form=form)
-
+    
 @app.route('/profile')
 def profile():
     current_user_email = session.get('current_user_email')
@@ -170,12 +186,17 @@ def profile():
 def delete_post(post_id):
     print(post_id)
     notification_to_delete = Notification.query.filter_by(post_id=post_id).first()
-    db.session.delete(notification_to_delete)
-    db.session.commit()
+    if notification_to_delete:
+        print(notification_to_delete)
+        db.session.delete(notification_to_delete)
+        db.session.commit()
     
     post_to_delete = Post.query.filter_by(id=post_id).first()
-    db.session.delete(post_to_delete)
-    db.session.commit()
+    if post_to_delete:
+        print(post_to_delete)
+        db.session.delete(post_to_delete)
+        db.session.commit()
+    
     current_user_email = session.get('current_user_email')
     user = User.query.filter_by(email=current_user_email).first()
     posts = Post.query.filter_by(author_id=user.id).filter_by(status='approved').all()
@@ -234,6 +255,24 @@ def delete_account():
         return redirect(url_for('home'))
 
     # Delete the user by email
+    User_k = UserRepository.get_by_email(current_user_email)
+    
+    followers = Follow.query.filter_by(follower_id=User_k.id)
+    followeds = Follow.query.filter_by(followed_id=User_k.id)
+    posts = Post.query.filter_by(author_id=User_k.id)
+    
+    for follower in followers:
+        db.session.delete(follower)
+        db.session.commit()
+        
+    for followed in followeds:
+        db.session.delete(followed)
+        db.session.commit()
+        
+    for post in posts:
+        db.session.delete(post)
+        db.session.commit()
+        
     user_to_delete = UserRepository.delete_by_email(current_user_email)
     
     if user_to_delete:
@@ -245,36 +284,54 @@ def delete_account():
 
 
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = UserRepository.get_by_email(form.email.data)
+        user = User.query.filter_by(email=form.email.data).first()
 
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            # Store user's email in session
-            session['current_user_email'] = form.email.data
-
-            login_user(user, remember=form.remember.data)
-            flash(f"You have been logged in successfully", "success")
+        if user:
+            if user.user_type == 'admin':
+                session['current_user_email'] = form.email.data  # Store user's email in session
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for('admin_dashboard'))
 
             if user.user_type == 'reviewer':
-                
+                session['current_user_email'] = form.email.data  # Store user's email in session
+                login_user(user, remember=form.remember.data)
                 posts = Post.query.filter_by(status='pending').all()
-                
                 return render_template('reviewer_gui.html', posts=posts)
-            elif user.user_type=='researcher' or user.user_type=='non-researcher':
-                
-                return redirect(url_for("home_page"))
-            
-            else:
-                return ('Hello , Login successfully')
 
-        else:
-            flash(f"Login unsuccessful. Please check the credentials", "danger")
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                session['current_user_email'] = form.email.data  # Store user's email in session
+                login_user(user, remember=form.remember.data)
+                flash("You have been logged in successfully", "success")
+
+                if user.user_type == 'researcher' or user.user_type == 'non-researcher':
+                    form = PostForm()
+                    if form.validate_on_submit():
+                        post_n = Post(
+                            author_id=2,
+                            reviewer_id=5,
+                            title=form.label.data,
+                            content=form.post.data,
+                            status='pending')
+
+                        db.session.add(post_n)
+                        db.session.commit()
+                        flash(f"Post created successfully for {form.label.data}", "success")
+                        time.sleep(5)
+                        return render_template('Created')
+
+                    return render_template('add_post.html', form=form)
+                else:
+                    return "Hello, Login successfully"
+            else:
+                flash("Login unsuccessful. Please check the credentials", "danger")
+       
 
     return render_template('signIn.html', form=form)
-
 
 @app.route('/logout', methods=['GET'])
 def logout():
@@ -381,6 +438,11 @@ def add_post():
     if form.validate_on_submit():
         current_user_email = session.get('current_user_email')  # Retrieve user's email from session
         current_user = User.query.filter_by(email=current_user_email).first()
+
+        if current_user.user_type != "Researcher":
+             flash('Sorry! create posts are only allowed for researchers!', 'danger')
+             return redirect(url_for('add_post'))
+
         if current_user:
             post_n = Post(
                 author_id=current_user.id,
@@ -588,6 +650,76 @@ def search_posts():
             })
         
         return jsonify(results)
+       #  return render_template('received_messages.html', messages_received=messages_received, sender_names=sender_names, sender_emails=sender_emails,current_page='received_messages')
+    
+    return jsonify([])
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
+def admin_dashboard():
+    form = RegistrationForm_Reviewer()
+    if form.validate_on_submit():
+        try:
+            reviewer = Reviewer(
+                fname=form.fname.data,
+                lname=form.lname.data,
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data
+            )
+            db.session.add(reviewer)
+            db.session.commit()
+            flash('Account created successfully!', 'success')
+        except Exception as e:
+            flash('An error occurred while creating the account. Please try again later.', 'error')
+            app.logger.error('Error creating reviewer: %s', str(e))
+            db.session.rollback()  # Rollback changes if an error occurs
+    else:
+        print("Form errors:", form.errors)  # Print form validation errors
+    return render_template('admin.html', form=form)
+
+from sqlalchemy import or_
+
+@app.route('/search_users', methods=['POST'])
+def search_users():
+    data = request.get_json()
+    search_query = data.get('query', '').strip()
+    
+    print("Search query:", search_query)  # Add this line for debugging
+    
+    if search_query:
+        search_pattern = f"%{search_query}%"
+        matching_users = User.query.filter(or_(User.fname.ilike(search_pattern), User.lname.ilike(search_pattern))).all()
+        
+        print("Matching users:", matching_users)  # Add this line for debugging
+        
+        results = []
+        for user in matching_users:
+            highlighted_name = f"{user.fname} {user.lname}".replace(search_query, f"<mark>{search_query}</mark>")
+            results.append({
+                'firstname': user.fname,
+                'lastname': user.lname,
+                'highlighted_name': highlighted_name
+            })
+        
+        return jsonify(results)
     
     return jsonify([])
 
+@app.route('/add_comment', methods=['POST', 'GET'])
+def add_comment():
+    form = CommentForm()
+    print(request.form)  # Print incoming form data
+
+    if form.validate_on_submit():
+        post_id = request.form.get('post_id')
+        comment_content = request.form.get('comment')
+        print(comment_content)
+
+        if post_id and comment_content:
+            new_comment = Comment(content=comment_content, post_id=post_id, user_id=current_user.id)
+            db.session.add(new_comment)
+            db.session.commit()
+            flash("Comment added successfully!", "success")
+            return redirect(url_for('home_page'))
+    flash("Failed to add comment. Please check the form.", "danger")
+    return redirect(url_for('home_page'))
+      

@@ -35,6 +35,18 @@
             <div class="col-md-6 right-half">
                 <div class="form-container">
                     <h3 class="mb-4">Sign In</h3>
+                     <!-- Display flash messages -->
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                {% if 'danger' in message %}
+                                    <div class="alert alert-danger">
+                                        {{ message }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                     <form method="POST" action="{{ url_for('login') }}">
                         {{ form.csrf_token }}
                         <div class="form-group">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ٍSearch Posts</title>
+    <title>ٍSearch Users</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -12,17 +12,16 @@
 </head>
 <body>
 
-
-<!-- Search functionality -->
+    <!-- Search functionality -->
 <div class="input-group mt-3">
-    <input type="text" id="search-topics-input" class="form-control" placeholder="Search for topics/posts" aria-label="Search for topics" aria-describedby="search-addon-topics">
+    <input type="text" id="search-users-input" class="form-control" placeholder="Search for users" aria-label="Search for users" aria-describedby="search-addon-users">
     <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" id="search-addon-topics"><i class="fas fa-search"></i></button>
+        <button class="btn btn-outline-secondary" type="button" id="search-addon-users"><i class="fas fa-search"></i></button>
     </div>
 </div>
-<div class="scroll-box mt-3" id="found-topics">
-    Found topics/posts...
-    <!-- Add the list of found posts here -->
+<div class="scroll-box mt-3" id="found-users">
+    Found users...
+    <!-- Add the list of found users here -->
 </div>
 
 <!-- JavaScript Libraries -->
@@ -30,10 +29,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
 
 <script>
-    // Search functionality
-    document.getElementById('search-addon-topics').addEventListener('click', function() {
-        const query = document.getElementById('search-topics-input').value;
-        fetch('/search_posts', {
+    // Search functionality for users
+    document.getElementById('search-addon-users').addEventListener('click', function() {
+        const query = document.getElementById('search-users-input').value;
+        fetch('/search_users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -42,24 +41,19 @@
         })
         .then(response => response.json())
         .then(data => {
-            const resultsContainer = document.getElementById('found-topics');
+            const resultsContainer = document.getElementById('found-users');
             resultsContainer.innerHTML = '';
             if (data.length > 0) {
-                data.forEach(post => {
-                    const postElement = document.createElement('div');
-                    postElement.classList.add('post-container');
-                    postElement.innerHTML = `
-                        <div class="author-info">
-                            <div class="author-name">
-                                <div class="author-box">${post.author_first_name} ${post.author_last_name}</div>
-                            </div>
-                        </div>
-                        <p class="post-content">${highlightQuery(post.content, query)}</p>
+                data.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.classList.add('user-container');
+                    userElement.innerHTML = `
+                        <p class="user-content">${highlightQuery(user.highlighted_name, query)}</p> <!-- Assuming highlighted_name is returned from the backend -->
                     `;
-                    resultsContainer.appendChild(postElement);
+                    resultsContainer.appendChild(userElement);
                 });
             } else {
-                resultsContainer.innerHTML = 'No matching posts found';
+                resultsContainer.innerHTML = 'No matching users found';
             }
         })
         .catch(error => console.error('Error:', error));
@@ -70,6 +64,10 @@
         return text.replace(regex, '<mark style="background-color: rgba(0, 0, 0, 0.2);">$1</mark>');
     }
 </script>
+
+
+
+
 
 </body>
 </html>
