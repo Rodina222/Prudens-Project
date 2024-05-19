@@ -102,5 +102,29 @@ class ResetPasswordForm(FlaskForm):
         "Confirm Password", validators=[DataRequired(), EqualTo("password")]
     )
     submit = SubmitField("Reset Password")
-class support_form(FlaskForm):
-    problem = StringField("what's your issue?", validators=[DataRequired()])
+
+
+class RegistrationForm_Reviewer(FlaskForm):
+    fname = StringField('First Name', validators=[DataRequired(), Length(min=2, max=25)])
+    lname = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=25)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=25)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[
+        DataRequired(),
+        Regexp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_])[A-Za-z\\d@$!%*?&_]{8,32}$")
+    ])
+    confirm_password = PasswordField('Confirm Password', validators=[
+        DataRequired(),
+        EqualTo('password', message='Passwords must match')
+    ])
+    submit = SubmitField('Sign Up')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError("Username already exists! Please choose a different one")
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("Email already exists! Please choose a different one")

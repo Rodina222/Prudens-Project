@@ -1,10 +1,21 @@
-from prudens.models import User, Researcher, NonResearcher, Reviewer, Admin, Post, Comment, React, Follow, Message, Notification, Issue
-from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
-from prudens.forms import RegistrationForm, LoginForm, RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, support_form
-from prudens import app, bcrypt, db, mail
+from prudens.models import User, Researcher,NonResearcher, Reviewer, Admin, Post, Comment, React ,Follow,Message,Notification
+from flask import Flask, render_template ,url_for ,flash, redirect, request
+from prudens.forms import RegistrationForm , LoginForm,RegistrationForm_Non, PostForm, RequestResetForm, ResetPasswordForm, RegistrationForm_Reviewer
+from prudens import app , bcrypt,db ,mail
 import time
 from datetime import datetime
+import base64
+
 from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
+from flask_login import (
+    login_required,
+    login_user,
+    current_user,
+    logout_user,
+    login_required,
+)
+
 from flask import session
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
@@ -273,32 +284,49 @@ def delete_account():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = UserRepository.get_by_email(form.email.data)
+        user = User.query.filter_by(email=form.email.data).first()
 
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            # Store user's email in session
-            session['current_user_email'] = form.email.data
-
-            login_user(user, remember=form.remember.data)
-            flash(f"You have been logged in successfully", "success")
+        if user:
+            if user.user_type == 'admin':
+                session['current_user_email'] = form.email.data  # Store user's email in session
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for('admin_dashboard'))
 
             if user.user_type == 'reviewer':
-                
+                session['current_user_email'] = form.email.data  # Store user's email in session
+                login_user(user, remember=form.remember.data)
                 posts = Post.query.filter_by(status='pending').all()
-                
                 return render_template('reviewer_gui.html', posts=posts)
-            elif user.user_type=='researcher' or user.user_type=='non-researcher':
-                
-                return redirect(url_for("home_page"))
-            
-            else:
-                return ('Hello , Login successfully')
 
-        else:
-            flash(f"Login unsuccessful. Please check the credentials", "danger")
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                session['current_user_email'] = form.email.data  # Store user's email in session
+                login_user(user, remember=form.remember.data)
+                flash("You have been logged in successfully", "success")
+
+                if user.user_type == 'researcher' or user.user_type == 'non-researcher':
+                    form = PostForm()
+                    if form.validate_on_submit():
+                        post_n = Post(
+                            author_id=2,
+                            reviewer_id=5,
+                            title=form.label.data,
+                            content=form.post.data,
+                            status='pending')
+
+                        db.session.add(post_n)
+                        db.session.commit()
+                        flash(f"Post created successfully for {form.label.data}", "success")
+                        time.sleep(5)
+                        return render_template('Created')
+
+                    return render_template('add_post.html', form=form)
+                else:
+                    return "Hello, Login successfully"
+            else:
+                flash("Login unsuccessful. Please check the credentials", "danger")
+       
 
     return render_template('signIn.html', form=form)
-
 
 @app.route('/logout', methods=['GET'])
 def logout():
@@ -592,6 +620,30 @@ def reply_message():
     # Redirect to the sent messages page if the request method is not POST
     return redirect(url_for('sent_messages'))
 
+<<<<<<< HEAD
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
+def admin_dashboard():
+    form = RegistrationForm_Reviewer()
+    if form.validate_on_submit():
+        try:
+            reviewer = Reviewer(
+                fname=form.fname.data,
+                lname=form.lname.data,
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data
+            )
+            db.session.add(reviewer)
+            db.session.commit()
+            flash('Account created successfully!', 'success')
+        except Exception as e:
+            flash('An error occurred while creating the account. Please try again later.', 'error')
+            app.logger.error('Error creating reviewer: %s', str(e))
+            db.session.rollback()  # Rollback changes if an error occurs
+    else:
+        print("Form errors:", form.errors)  # Print form validation errors
+    return render_template('admin.html', form=form)
+=======
 @app.route('/search_posts', methods=['POST'])
 def search_posts():
     data = request.get_json()
@@ -614,4 +666,5 @@ def search_posts():
         return jsonify(results)
     
     return jsonify([])
+>>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 
