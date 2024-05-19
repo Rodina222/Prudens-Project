@@ -620,7 +620,6 @@ def reply_message():
     # Redirect to the sent messages page if the request method is not POST
     return redirect(url_for('sent_messages'))
 
-<<<<<<< HEAD
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     form = RegistrationForm_Reviewer()
@@ -643,28 +642,4 @@ def admin_dashboard():
     else:
         print("Form errors:", form.errors)  # Print form validation errors
     return render_template('admin.html', form=form)
-=======
-@app.route('/search_posts', methods=['POST'])
-def search_posts():
-    data = request.get_json()
-    search_query = data.get('query', '').strip()
-    
-    if search_query:
-        search_pattern = f"%{search_query}%"
-        matching_posts = Post.query.filter(Post.content.ilike(search_pattern)).all()
-        
-        results = []
-        for post in matching_posts:
-            author = User.query.get(post.author_id)
-            highlighted_content = post.content.replace(search_query, f"<mark>{search_query}</mark>")
-            results.append({
-                'author_first_name': author.fname,
-                'author_last_name': author.lname,
-                'content': highlighted_content
-            })
-        
-        return jsonify(results)
-    
-    return jsonify([])
->>>>>>> 07bc80e7f3cc733a528b46002270829c7d471c4c
 
