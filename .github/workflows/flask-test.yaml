@@ -31,4 +31,5 @@ jobs:
       - name: Run Tests
         run: |
           cd ./tests
-          go test -v main.go
+          pytest -v
+
